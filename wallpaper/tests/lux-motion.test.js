@@ -67,12 +67,12 @@ test('native face and Pet events reset completely between emotes',()=>{
   const idle=motion.visibilityFor(metadata,'Idle',0);
   assert.equal(idle.has('Pet'),false);assert.equal(idle.has('Surprise'),false);assert.ok(idle.has('Face_Basic_Eyes'));
 });
-test('the actual forty-desk classroom has collision-free routes to desks and both poros',()=>{
+test('the actual twenty-four-desk classroom has collision-free routes to desks and both poros',()=>{
   const classroom=require('../classroom.js').computeLayout(2560,1440);
   const options={polygon:classroom.polygon,obstacles:classroom.obstacles,waypoints:classroom.waypoints,padding:12};
   const env=motion.environment(options),from={x:1280,y:850};
-  assert.equal(classroom.obstacles.length,40);
-  const targets=classroom.waypoints.filter(p=>p.kind==='poro'||(p.kind==='desk'&&(p.col===0||p.col===7)));
+  assert.equal(classroom.obstacles.length,24);
+  const targets=classroom.waypoints.filter(p=>p.kind==='poro'||(p.kind==='desk'&&(p.col===0||p.col===5)));
   for(const target of targets){
     const path=motion.findPath(from,target,options);assert.ok(path,`No route to ${target.id}`);
     for(let i=1;i<path.length;i++)assert.equal(motion.clearSegment(path[i-1],path[i],env),true,`Desk collision en route to ${target.id}`);
@@ -87,4 +87,47 @@ test('camera projection keeps native planted-foot motion matched in both screen 
   close(vertical,Math.cos(elevation)/Math.sin(elevation));
   assert.ok(horizontal<vertical&&vertical<1);
   close(motion.strideTimeScale(speed*1.5,bodyPixels,0,elevation),vertical*1.5);
+});
+let runtimeHelpers;
+async function getRuntimeHelpers(){
+ if(!runtimeHelpers){
+  const originalWindow=global.window;global.window={};
+  try{runtimeHelpers=await import('../../src/lux.mjs');}
+  finally{if(originalWindow===undefined)delete global.window;else global.window=originalWindow;}
+ }
+ return runtimeHelpers;
+}
+
+test('smooth theme fades keep the navigation fingerprint stable until furniture topology changes',async()=>{
+ const {navigationFingerprint}=await getRuntimeHelpers();
+ const viewport={width:2560,height:1440},options={bounds:floor,padding:12,obstacles:[{x:400,y:200,width:100,height:100}],waypoints:[{id:'desk-1',kind:'desk',x:450,y:350}]};
+ const day=navigationFingerprint({...options,nightMix:0},viewport);
+ for(const mix of [.1,.3,.6,.8])assert.equal(navigationFingerprint({...options,nightMix:mix},viewport),day);
+ assert.notEqual(navigationFingerprint({...options,obstacles:[],waypoints:[]},viewport),day);
+});
+
+test('Lux walks out of an appearing desk before its full collision map activates',async()=>{
+ const {planNavigationChange}=await getRuntimeHelpers();
+ const position={x:500,y:300},options={bounds:floor,padding:12,obstacles:[{x:450,y:250,width:100,height:100},{x:680,y:180,width:120,height:220}],waypoints:[]};
+ const plan=planNavigationChange(motion,position,options);assert.equal(plan.kind,'escape');
+ const nav=motion.createNavigator({...plan.escapeOptions,position,speed:180});
+ close(nav.snapshot().x,position.x);close(nav.snapshot().y,position.y);
+ assert.equal(plan.escapeOptions.obstacles.length,1,'unrelated appearing furniture still blocks the route');
+ assert.equal(nav.setTarget(plan.escapeTarget,'evacuate'),true);
+ let previous=nav.snapshot();
+ for(let i=0;i<150;i++){
+  const next=nav.update(.02);assert.ok(Math.hypot(next.x-previous.x,next.y-previous.y)<=3.600001,'there is no position jump');previous=next;
+ }
+ assert.ok(motion.isWalkable(nav.snapshot(),plan.environment));
+ const before=nav.snapshot();nav.setEnvironment(options);close(nav.snapshot().x,before.x);close(nav.snapshot().y,before.y);
+});
+
+test('night topology removes phantom furniture from the active route',async()=>{
+ const {planNavigationChange}=await getRuntimeHelpers();
+ const position={x:100,y:300},destination={x:900,y:300};
+ const dayOptions={bounds:floor,padding:12,obstacles:[{x:400,y:150,width:200,height:300}],waypoints:[{kind:'desk',x:500,y:500}]};
+ const dayPath=motion.findPath(position,destination,dayOptions);assert.ok(dayPath.length>2);
+ const night=planNavigationChange(motion,position,{...dayOptions,obstacles:[],waypoints:[]});
+ assert.equal(night.kind,'direct');assert.equal(night.environment.obstacles.length,0);
+ assert.equal(motion.findPath(position,destination,night.options).length,2);
 });

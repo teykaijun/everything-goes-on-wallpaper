@@ -79,7 +79,7 @@
     function resize() {
       viewportWidth = finiteSize(host.innerWidth);
       viewportHeight = finiteSize(host.innerHeight);
-      rect = options.sceneMode === "study" ? { x:0, y:0, width:viewportWidth, height:viewportHeight, orientation:"portrait" } : getArenaRect(viewportWidth, viewportHeight);
+      rect = options.sceneMode === "window" ? { x:0, y:0, width:viewportWidth, height:viewportHeight, orientation:"portrait" } : getArenaRect(viewportWidth, viewportHeight);
       root.dataset.orientation = rect.orientation;
       root.style.setProperty("--arena-x", rect.x + "px");
       root.style.setProperty("--arena-y", rect.y + "px");
@@ -109,7 +109,7 @@
       if (disposed) return;
       var state = getState() || {}, mix = clamp(state.nightMix);
       setMix(mix);
-      if (!context || options.sceneMode === "study") return;
+      if (!context || options.sceneMode === "window") return;
       // Use the already decoded videos; no extra media instances or soundtracks.
       context.globalAlpha = 1;
       context.fillStyle = mix > .5 ? "#181636" : "#513d39";
@@ -136,7 +136,7 @@
       atmosphere.style.animationPlayState = stopped ? "paused" : "running";
       root.dataset.scenePaused = String(stopped);
       if (stopped) { host.cancelAnimationFrame(frame); frame = 0; }
-      else if (!frame && !disposed && options.sceneMode !== "study") {
+      else if (!frame && !disposed && options.sceneMode !== "window") {
         lastDraw = -Infinity;
         frame = host.requestAnimationFrame(tick);
       }

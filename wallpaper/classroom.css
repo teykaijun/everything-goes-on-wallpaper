@@ -3,6 +3,7 @@
 .classroom-scene {
   display: contents;
   pointer-events: none;
+  --desk-opacity: 1;
   --desk-woodTop: #e8be68;
   --desk-woodLight: #ffe1a0;
   --desk-woodEdge: #c69a56;
@@ -21,6 +22,7 @@
   display: none !important;
 }
 .classroom-desk {
+  opacity: var(--desk-opacity, 1);
   position: absolute;
   pointer-events: none;
   user-select: none;

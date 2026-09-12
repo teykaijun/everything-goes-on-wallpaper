@@ -2,9 +2,9 @@
   "use strict";
   var schedule = window.WallpaperSchedule;
   var config = window.WALLPAPER_CONFIG || {};
-  var isStudy = window.innerHeight > window.innerWidth;
-  if (isStudy) config = Object.assign({}, config, {daySources:["media/study/day.mp4"], nightSources:["media/study/night.mp4"], volume:0, luxEnabled:false});
-  document.documentElement.dataset.scene = isStudy ? "study" : "classroom";
+  var isPortraitWindow = window.innerHeight > window.innerWidth;
+  if (isPortraitWindow) config = Object.assign({}, config, {daySources:["media/window/day.mp4"], nightSources:["media/window/night.mp4"], volume:0, luxEnabled:false});
+  document.documentElement.dataset.scene = isPortraitWindow ? "window" : "classroom";
   var settings = schedule.normalize(config);
   var phases = ["day", "night"];
   var videos = { day: document.getElementById("day"), night: document.getElementById("night") };
@@ -313,7 +313,7 @@
   var emoteDock = document.getElementById("lux-emotes");
   var emoteToggle = document.getElementById("emote-toggle");
   var emoteMenu = document.getElementById("emote-menu");
-  emoteDock.hidden = isStudy;
+  emoteDock.hidden = isPortraitWindow;
   emoteMenu.hidden = true;
   emoteToggle.addEventListener("click", function () {
     emoteMenu.hidden = !emoteMenu.hidden;
@@ -324,16 +324,16 @@
     if (button && lux) lux.command(button.dataset.emote);
   });
   window.addEventListener("resize", function () {
-    if ((window.innerHeight > window.innerWidth) !== isStudy) window.location.reload();
+    if ((window.innerHeight > window.innerWidth) !== isPortraitWindow) window.location.reload();
   });
 
   // Read-only diagnostics for local smoke tests and the preview console.
   window.wallpaperState = function () {
     return { active: active, pending: pending, nightMix: mix, paused: paused(), browserMuted: browserMuted, settings: Object.assign({}, settings) };
   };
-  if (window.ArenaLayout) sceneLayout = window.ArenaLayout.create({day: videos.day, night: videos.night, canvas: document.getElementById("ambient"), sceneMode: isStudy ? "study" : "classroom", getState: function () { return {nightMix: mix, paused: paused()}; }});
-  if (window.ClassroomScene && !isStudy) classroom = window.ClassroomScene.create({element:document.getElementById("classroom-desks"), enabled:config.classroomDesks !== false, getState:function(){return {nightMix:mix,paused:paused()};}});
-  if (window.ChibiLux && sceneLayout && !isStudy) lux = window.ChibiLux.create({element: document.getElementById("lux-layer"), layout: sceneLayout, getState: function () { return {nightMix: mix, paused: paused()}; }, enabled: luxSettings.enabled, size: luxSettings.size, speed: luxSettings.speed, interactions: luxSettings.interactions});
+  if (window.ArenaLayout) sceneLayout = window.ArenaLayout.create({day: videos.day, night: videos.night, canvas: document.getElementById("ambient"), sceneMode: isPortraitWindow ? "window" : "classroom", getState: function () { return {nightMix: mix, paused: paused()}; }});
+  if (window.ClassroomScene && !isPortraitWindow) classroom = window.ClassroomScene.create({element:document.getElementById("classroom-desks"), enabled:config.classroomDesks !== false, getState:function(){return {nightMix:mix,paused:paused()};}});
+  if (window.ChibiLux && sceneLayout && !isPortraitWindow) lux = window.ChibiLux.create({element: document.getElementById("lux-layer"), layout: sceneLayout, getState: function () { return {nightMix: mix, paused: paused()}; }, enabled: luxSettings.enabled, size: luxSettings.size, speed: luxSettings.speed, interactions: luxSettings.interactions});
   render();
   syncEffects();
   updatePreview();

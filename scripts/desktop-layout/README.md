@@ -104,7 +104,13 @@ guess when an item is missing or ambiguous. New items not in the saved snapshot
 are left in place. Renamed or deleted items can require a reviewed replacement
 plan. Re-enabling auto-arrange or grid snapping may let Explorer reflow positions.
 
-For day/night layouts, keep separate reviewed plans. The helper is one-shot: it
+The v2.1 bench layout uses one stable plan for day and night: 18 icons in the upper bench band and 22 in the lower band, outside the battlefield. Its local plan is `build/desktop-layout/benches-v2.1.json`; its pre-change backup is `build/desktop-layout/before-benches-v2.1.json`. Restore that backup with the command below, choosing a new backup filename if it already exists:
+
+```powershell
+.\build\desktop-layout\bin\DesktopLayout.exe restore .\build\desktop-layout\before-benches-v2.1.json --backup .\build\desktop-layout\before-bench-restore.json
+```
+
+The helper is one-shot: it
 does not install an automation, background service, startup entry, or scheduler.
 
 ## Read-only checks

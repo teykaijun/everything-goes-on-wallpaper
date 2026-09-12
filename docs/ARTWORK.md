@@ -1,5 +1,24 @@
 # Artwork and scene composition
 
+## Version 2.1 — arena window and personal daytime seats
+
+The current portrait scene is a close view of the arena's ordinary rectangular school windows. The two aligned masters use the arena's warm afternoon and electric blue-magenta night palettes. Both were made with the built-in `image_gen` tool. [Exact final prompts and saved paths](WINDOW-ART-PROMPTS.md).
+
+| Current asset | Dimensions | Purpose |
+| --- | --- | --- |
+| `wallpaper/media/window/day.png` | 941×1672 | Window in golden classroom light |
+| `wallpaper/media/window/night.png` | 941×1672 | Same window under the cosmic night palette |
+| `wallpaper/media/window/day.mp4` | 1440×2560 | 24-second day loop, 30fps |
+| `wallpaper/media/window/night.mp4` | 1440×2560 | 24-second night loop, 30fps |
+
+The MP4s are upscaled exports with periodic illumination and drifting dust/starlight. The window frames remain still. Lively supplies automatic clock switching and the 8-second transition; an MP4 by itself does not read the Windows clock.
+
+The daytime classroom has 24 individually styled desk-and-seat combinations: differently placed books, papers, pencil cases, bottles and bags. These repo-native SVG details were inspired by the belongings visible in the user's [reference at 0:13](https://www.youtube.com/watch?v=XF4bOEyCRtc&t=13s). They are an adaptation rather than a seat-for-seat model extraction. Added furniture disappears at night. Desktop icons now occupy compact upper/lower bench bands outside the battlefield and are independent of the furniture.
+
+## Version 2.0 retained sources
+
+The earlier study masters and original cleanup plates below are retained locally. They are not the active portrait design in v2.1.
+
 Version 2.0 combines original arena footage, a small generated cleanup patch,
 original vector classroom furniture, and an independent generated portrait study.
 All four PNG masters below were created or edited with the built-in

@@ -5,12 +5,33 @@ const clamp=(value,min,max)=>Math.max(min,Math.min(max,Number(value)||min));
 const NATIVE_BODY_HEIGHT=166.656175;
 const NATIVE_BODY_HEIGHTS_PER_SECOND=2.4;
 
+export function navigationFingerprint(options,viewport){
+  return JSON.stringify([viewport.width,viewport.height,options.padding,options.bounds,options.polygon,
+    (options.obstacles||[]).map(item=>{const r=item.rect||item;return [r.x,r.y,r.width,r.height];}),
+    (options.waypoints||[]).map(point=>[point.id,point.kind,point.x,point.y,point.lookAt?.x,point.lookAt?.y])]);
+}
+
+export function planNavigationChange(motion,position,options){
+  const environment=motion.environment(options);
+  if(motion.isWalkable(position,environment))return {kind:'direct',environment,options};
+  const escapeTarget=motion.nearestWalkable(position,environment);
+  if(escapeTarget&&motion.insideRect(position,environment.bounds)&&motion.insidePolygon(position,environment.polygon)){
+    // An appearing desk may surround Lux. Allow departure from only the desks
+    // containing her feet, while respecting every other newly visible desk.
+    const escapeOptions={...options,obstacles:(options.obstacles||[]).filter((_,index)=>!motion.insideRect(position,environment.obstacles[index]))};
+    if(motion.findPath(position,escapeTarget,escapeOptions))return {kind:'escape',environment,options,escapeOptions,escapeTarget};
+  }
+  // Only a viewport/floor change can put the old position outside the whole floor.
+  return {kind:'relocate',environment,options};
+}
+
 window.ChibiLux={create({element,layout,getState,enabled=true,size=100,speed=100,interactions=true}){
   const motion=window.LuxMotion;
   let destroyed=false,paused=false,loaded=false,failed=false,frame=0,last=0,elapsed=0;
   const settings={enabled:enabled!==false,size:clamp(size,45,160),speed:clamp(speed,50,150),interactions:interactions!==false};
   let mixer,actor,currentAction=null,currentClip='',sequencer,navigator,environment;
   let currentRunRate=1;
+  let environmentKey='',pendingEnvironment=null,activeSceneryKind=null;
   let previousPhase='idle',automaticWait=3,activityCount=0,emoteIndex=0,lastVisit=-1,afterArrival=null;
   let viewport={width:innerWidth,height:innerHeight},renderWidth=0,renderHeight=0,hitBox=null,lastPointer=null;
   const clips=new Map(),actions=new Map(),managedMaterials=[];
@@ -56,17 +77,56 @@ window.ChibiLux={create({element,layout,getState,enabled=true,size=100,speed=100
     }
     return {polygon,bounds,obstacles:classroom.getObstacles?.()||[],waypoints:classroom.getWaypoints?.()||[],padding:Math.max(6,rect.height*.08*1.06*settings.size/100*.1)};
   }
-  function resize(){
-    const oldViewport=viewport;viewport={width:innerWidth,height:innerHeight};
-    const options=readEnvironment();environment=motion.environment(options);
+  function resize(event){
+    if(event?.type==='classroom-layout'&&event.detail?.navigationChanged===false)return;
+    const oldViewport=viewport,nextViewport={width:innerWidth,height:innerHeight},options=readEnvironment();
+    const key=navigationFingerprint(options,nextViewport);
+    if(key===environmentKey)return;
+    environmentKey=key;viewport=nextViewport;
     if(!navigator){
+      environment=motion.environment(options);
       const start=window.ArenaLayout.groundToScreen(.5,.8,innerWidth,innerHeight);
       navigator=motion.createNavigator({...options,position:start,speed:250,depthFactor:1/Math.sin(elevation)});
     }else{
-      const point=navigator.snapshot();
-      navigator.setEnvironment(options,{x:point.x*viewport.width/Math.max(1,oldViewport.width),y:point.y*viewport.height/Math.max(1,oldViewport.height)});
+      const point=navigator.snapshot(),scaleX=viewport.width/Math.max(1,oldViewport.width),scaleY=viewport.height/Math.max(1,oldViewport.height);
+      const scalePoint=value=>value&&({...value,x:value.x*scaleX,y:value.y*scaleY});
+      let resumeTarget=scalePoint(pendingEnvironment?pendingEnvironment.resumeTarget:point.target);
+      let resumeVisit=pendingEnvironment?pendingEnvironment.resumeVisit:afterArrival;
+      if(resumeVisit)resumeVisit={...resumeVisit,lookAt:scalePoint(resumeVisit.lookAt)};
+      const queuedEmote=pendingEnvironment?.emote;
+      const plan=planNavigationChange(motion,{x:point.x*scaleX,y:point.y*scaleY},options);
+      environment=plan.environment;
+      const desksActive=environment.waypoints.some(value=>value.kind==='desk');
+      if(!desksActive){
+        if(resumeTarget?.kind==='desk')resumeTarget=null;
+        if(resumeVisit?.kind==='desk')resumeVisit=null;
+        if(activeSceneryKind==='desk'){sequencer?.play('stop');activeSceneryKind=null;}
+      }
+      navigator.stop();pendingEnvironment=null;afterArrival=null;
+      const position={x:point.x*scaleX,y:point.y*scaleY};
+      if(plan.kind==='escape'){
+        navigator.setEnvironment(plan.escapeOptions,position);
+        if(navigator.setTarget(plan.escapeTarget,'evacuate')){
+          pendingEnvironment={options,resumeTarget,resumeVisit,emote:queuedEmote};
+          sequencer?.play('stop');previousPhase='idle';
+        }
+      }
+      if(!pendingEnvironment){
+        navigator.setEnvironment(options,position);
+        if(resumeTarget&&navigator.setTarget(resumeTarget,resumeTarget.kind))afterArrival=resumeVisit;
+        else{sequencer?.play('stop');previousPhase='idle';automaticWait=Math.max(automaticWait,1.5);}
+        if(queuedEmote)playEmote(queuedEmote.name,queuedEmote.lookAt,queuedEmote.kind);
+      }
     }
     renderWidth=0;last=0;
+  }
+  function finishEnvironmentChange(){
+    const pending=pendingEnvironment;if(!pending)return;
+    pendingEnvironment=null;navigator.stop();navigator.setEnvironment(pending.options);
+    if(pending.resumeTarget&&navigator.setTarget(pending.resumeTarget,pending.resumeTarget.kind))afterArrival=pending.resumeVisit;
+    else automaticWait=Math.max(automaticWait,1.5);
+    if(pending.emote)playEmote(pending.emote.name,pending.emote.lookAt,pending.emote.kind);
+    return Boolean(pending.emote);
   }
   function setAction(state){
     let action=actions.get(state.clip);
@@ -84,16 +144,22 @@ window.ChibiLux={create({element,layout,getState,enabled=true,size=100,speed=100
     const visible=motion.visibilityFor(metadata,state.clip,state.time);
     managedMaterials.forEach(({material,name})=>{material.visible=visible.has(name);});
   }
-  function playEmote(name,facingPoint=null){
+  function playEmote(name,facingPoint=null,sceneryKind=null){
     if(!sequencer||!navigator)return;
+    if(pendingEnvironment){pendingEnvironment.resumeTarget=null;pendingEnvironment.resumeVisit=null;pendingEnvironment.emote={name,lookAt:facingPoint,kind:sceneryKind};return;}
     navigator.stop();afterArrival=null;previousPhase='idle';automaticWait=4+Math.random()*3;
     const point=navigator.snapshot();navigator.lookAt(facingPoint||{x:point.x,y:point.y+bodyHeight(point.y)*2},12);
-    sequencer.play(name);sprite.dataset.command=name;sprite.dataset.interaction=facingPoint?'scenery':'viewer';
+    sequencer.play(name);activeSceneryKind=sceneryKind;sprite.dataset.command=name;sprite.dataset.interaction=facingPoint?'scenery':'viewer';
   }
   function visit(point){
+    const visitAction=point.kind==='poro'?{name:'laugh',kind:'poro',lookAt:point.lookAt}:point.kind==='desk'?{name:'joke',kind:'desk',lookAt:point.lookAt}:null;
+    if(pendingEnvironment){
+      if(!motion.isWalkable(point,environment))return false;
+      pendingEnvironment.resumeTarget={x:point.x,y:point.y,kind:point.kind||'aisle'};
+      pendingEnvironment.resumeVisit=visitAction;pendingEnvironment.emote=null;return true;
+    }
     if(!navigator.setTarget(point,point.kind||'aisle'))return false;
-    afterArrival=point.kind==='poro'?{name:'laugh',lookAt:point.lookAt}:point.kind==='desk'?{name:'joke',lookAt:point.lookAt}:null;
-    automaticWait=3+Math.random()*3;return true;
+    afterArrival=visitAction;automaticWait=3+Math.random()*3;return true;
   }
   function chooseActivity(){
     activityCount++;
@@ -123,15 +189,17 @@ window.ChibiLux={create({element,layout,getState,enabled=true,size=100,speed=100
     const dt=last?Math.min(.1,(now-last)/1000):0;last=now;elapsed+=dt;
     const before=navigator.snapshot(),heightOnFloor=bodyHeight(before.y);
     navigator.setSpeed(heightOnFloor*NATIVE_BODY_HEIGHTS_PER_SECOND*settings.speed/100);
-    const pose=navigator.update(dt);
+    let pose=navigator.update(dt);
+    if(pendingEnvironment&&pose.arrived){const moved=pose.moved,emoteStarted=finishEnvironmentChange();pose={...navigator.snapshot(),arrived:!emoteStarted,moved};}
     const bodyPixels=bodyHeight(pose.y);
     currentRunRate=motion.strideTimeScale(heightOnFloor*NATIVE_BODY_HEIGHTS_PER_SECOND*settings.speed/100,bodyPixels,pose.yaw,elevation);
     if(pose.walking)sequencer.play('run');
     else if(previousPhase==='walking'||pose.arrived)sequencer.play('stop');
     previousPhase=pose.phase;
     let animation=sequencer.update(dt*(sequencer.snapshot().command==='run'?currentRunRate:1));
-    if(!pose.moving&&!animation.busy){
-      if(afterArrival){const visitAction=afterArrival;afterArrival=null;playEmote(visitAction.name,visitAction.lookAt);animation=sequencer.snapshot();}
+    if(!animation.busy)activeSceneryKind=null;
+    if(!pose.moving&&!animation.busy&&!pendingEnvironment){
+      if(afterArrival){const visitAction=afterArrival;afterArrival=null;playEmote(visitAction.name,visitAction.lookAt,visitAction.kind);animation=sequencer.snapshot();}
       else{
         automaticWait-=dt;
         if(automaticWait<=0){chooseActivity();animation=sequencer.snapshot();}
@@ -181,7 +249,7 @@ window.ChibiLux={create({element,layout,getState,enabled=true,size=100,speed=100
     if(name==='come-here'){
       const point=Number.isFinite(event.detail?.x)&&Number.isFinite(event.detail?.y)?event.detail:lastPointer;
       if(point&&!scenery().isIconPoint?.(point.x,point.y))visit(point);
-    }else if(name==='stop'){navigator.stop();afterArrival=null;sequencer.play('stop');automaticWait=8;}
+    }else if(name==='stop'){if(pendingEnvironment){pendingEnvironment.resumeTarget=null;pendingEnvironment.resumeVisit=null;pendingEnvironment.emote=null;}else{navigator.stop();sequencer.play('stop');}afterArrival=null;automaticWait=8;}
     else if(['dance','laugh','taunt','joke','laugh-wacky'].includes(name))playEmote(name);
   }
   function disposeModel(){
@@ -242,7 +310,7 @@ window.ChibiLux={create({element,layout,getState,enabled=true,size=100,speed=100
       restart();
     },
     command(name){commandEvent({detail:{name}});},
-    status(){return {loaded,failed,paused,enabled:settings.enabled,interactions:settings.interactions,elapsed,animation:currentClip,runTimeScale:currentRunRate,navigation:navigator?.snapshot(),clips:{walk:[...clips.keys()].find(name=>/^run$/i.test(name)),idle:[...clips.keys()].find(name=>/^idle$/i.test(name))}};},
+    status(){return {loaded,failed,paused,enabled:settings.enabled,interactions:settings.interactions,elapsed,animation:currentClip,runTimeScale:currentRunRate,evacuating:Boolean(pendingEnvironment),deskObstacles:environment?.obstacles.length||0,navigation:navigator?.snapshot(),clips:{walk:[...clips.keys()].find(name=>/^run$/i.test(name)),idle:[...clips.keys()].find(name=>/^idle$/i.test(name))}};},
     destroy(){
       destroyed=true;cancelAnimationFrame(frame);
       window.removeEventListener('resize',resize);window.removeEventListener('classroom-layout',resize);window.removeEventListener('lux-command',commandEvent);
