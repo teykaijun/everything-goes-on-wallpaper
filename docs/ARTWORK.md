@@ -1,10 +1,38 @@
 # Artwork and scene composition
 
-## Version 2.1 — arena window and personal daytime seats
+## Version 2.2 — furnished Star Guardian window (current)
 
-The current portrait scene is a close view of the arena's ordinary rectangular school windows. The two aligned masters use the arena's warm afternoon and electric blue-magenta night palettes. Both were made with the built-in `image_gen` tool. [Exact final prompts and saved paths](WINDOW-ART-PROMPTS.md).
+The current portrait scene adds personal belongings to the arena-style window while retaining the aligned rectangular frame, curtains, sill, and room geometry. Both 941×1672 masters were created with the built-in `image_gen` tool. They are generated fan illustrations, not extracted game assets. [Exact prompts and saved paths](WINDOW-ART-PROMPTS.md).
 
 | Current asset | Dimensions | Purpose |
+| --- | --- | --- |
+| `wallpaper/media/window-magic/day.png` | 941×1672 | Furnished window in golden afternoon light |
+| `wallpaper/media/window-magic/night.png` | 941×1672 | Aligned magical night window with relit and rearranged belongings |
+| `wallpaper/media/window-magic/day.mp4` | 1440×2560 | 24-second day loop, 30 fps, silent |
+| `wallpaper/media/window-magic/night.mp4` | 1440×2560 | 24-second night loop, 30 fps, silent |
+
+**Day direction:** a pink star planter with green leaves and pink flowers, a mint pencil cup, pastel star books, and a wing-trimmed pink satchel on the sill. White-and-pink trainers sit on the right floor. Warm school rooftops and golden afternoon lighting remain visible through the window.
+
+**Night direction:** the plant glows cyan-purple, with a cyan star lantern, open spellbook, and pink star crystal on the sill. The bag moves to the left floor, and the shoes pick up violet reflections. The window retains the arena's magenta-indigo cosmic palette.
+
+The window structure and furnishings are fixed raster artwork within each theme. The MP4s add actual encoded motion: visible dust and sunshafts by day; four-point glints, orbiting gold stars with cyan-pink trails, and local prop glows by night. These original procedural effects are authored for the wallpaper and do not reproduce Riot's particle engine. The 1440×2560 output is upscaled from the 941×1672 masters, not native 2K illustration detail.
+
+Rebuild the current loops with Python, Pillow, and imageio-ffmpeg:
+
+```powershell
+python -m pip install Pillow imageio-ffmpeg
+python scripts/build_window_media.py both
+```
+
+The builder uses `scripts/window_effects.py` for the transparent effect layers. `--preview-times 0,6,12,18` saves representative frames; `--output-dir PATH` selects a separate output folder. Lively provides the local-clock theme switch, 8-second crossfade, and separate music. The standalone MP4s are silent fixed-theme videos.
+
+The landscape arena, 24 daytime desks, 40 bench icon positions, and native Lux companion are unchanged from v2.1. The earlier window, study, and cleanup masters below remain available locally; current builds do not overwrite them.
+
+## Version 2.1 retained window sources and daytime seats
+
+Version 2.1 used a close view of the arena's ordinary rectangular school windows without the new sill and floor belongings. The aligned masters use warm afternoon and electric blue-magenta night palettes and were made with the built-in `image_gen` tool. These historical files are retained under `wallpaper/media/window/`.
+
+| Retained v2.1 asset | Dimensions | Purpose |
 | --- | --- | --- |
 | `wallpaper/media/window/day.png` | 941×1672 | Window in golden classroom light |
 | `wallpaper/media/window/night.png` | 941×1672 | Same window under the cosmic night palette |
@@ -17,7 +45,7 @@ The daytime classroom has 24 individually styled desk-and-seat combinations: dif
 
 ## Version 2.0 retained sources
 
-The earlier study masters and original cleanup plates below are retained locally. They are not the active portrait design in v2.1.
+The earlier study masters and original cleanup plates below are retained locally. They are not the active portrait design in v2.2.
 
 Version 2.0 combines original arena footage, a small generated cleanup patch,
 original vector classroom furniture, and an independent generated portrait study.
@@ -25,7 +53,7 @@ All four PNG masters below were created or edited with the built-in
 `image_gen` tool. The prompt descriptions are summaries of the requested
 art direction, not exact generation transcripts.
 
-## Generated masters
+## Version 2.0 generated masters
 
 | Master path | Dimensions | Purpose |
 | --- | --- | --- |
@@ -38,7 +66,7 @@ Masters and derived media remain local under `wallpaper/media/` and are
 excluded from Git. Retain these files to reproduce the same build; a new image
 generation from the prompt summaries will produce different pixels.
 
-## Portrait study prompt summaries
+## Version 2.0 portrait study prompt summaries
 
 **Day:** create a cohesive vertical magical study suitable for a portrait
 wallpaper, with a prominent window, a Poro, a wand, and a welcoming desk/study
@@ -81,9 +109,9 @@ The patch uses a **12-pixel feather**. Output files are
 The remaining frame retains the original arena footage; the original
 `day.webm` and `night.webm` loops and v1.0 MP4 exports are retained.
 
-## Classroom furniture and icon composition
+## Version 2.0 classroom furniture and icon composition
 
-`wallpaper/classroom.js` draws **40 original SVG desks** in five rows of eight,
+Version 2.0's `wallpaper/classroom.js` drew **40 original SVG desks** in five rows of eight,
 with perspective sizing, teal framing, wooden tops, chairs, shadows, and colors
 that blend between the arena's day/night themes. This furniture is authored as
 vector code and was not produced by image generation or extracted from Riot's
@@ -92,15 +120,16 @@ game files.
 The composition follows the user's
 [classroom desktop reference](https://www.youtube.com/shorts/XF4bOEyCRtc),
 especially **00:13**, where shortcuts sit on classroom tables. The implementation
-provides 40 slots to accommodate the actual workstation inventory. It also
-exports obstacle and aisle data so Lux can move through the room.
+provided 40 desk slots to accommodate the workstation inventory and exported
+obstacle and aisle data for Lux. Since v2.1, icons use the separate bench bands
+and the daytime classroom uses 24 individually styled desks.
 
 Actual Windows icons are positioned separately with the documented Shell helper.
 The artwork does not contain screenshots, copies, or baked-in pictures of those
 shortcuts. The original desktop layout is kept in the local, Git-excluded
 `build/desktop-layout/original.json` backup.
 
-## Rebuild
+## Rebuild the historical v2.0 media
 
 After restoring the PNG masters and original arena loops:
 

@@ -1,15 +1,15 @@
-# Everything Goes On — Bench & Window
+# Everything Goes On — Star Window
 
-Version **2.1.0** is a Lively Wallpaper setup for a horizontal main monitor and a
+Version **2.2.0** is a Lively Wallpaper setup for a horizontal main monitor and a
 vertical secondary monitor. It combines TFT's **Everything Goes On** arena and
 instrumental soundtrack with a daytime classroom, desktop icons on the arena's
 bench bands, an interactive native 3D **Chibi Star Guardian Lux**, and a separate
-animated window view for the portrait display.
+furnished, animated Star Guardian window view for the portrait display.
 
 ## Use the wallpaper
 
-Download `Everything-Goes-On-Bench-Window-Lively.zip` from the
-[v2.1.0 release](https://github.com/teykaijun/everything-goes-on-wallpaper/releases/tag/v2.1.0).
+Download `Everything-Goes-On-Star-Window-Lively.zip` from the
+[v2.2.0 release](https://github.com/teykaijun/everything-goes-on-wallpaper/releases/tag/v2.2.0).
 The release also provides separate day and night portrait MP4s.
 
 1. Install [Lively Wallpaper](https://www.rocksdanister.com/lively/) and import the ZIP.
@@ -23,11 +23,18 @@ and chairs fade out at night; their collision obstacles and desk-visit targets
 are removed too. The arena's original side chairs remain in the source footage.
 Lux walks through the open night arena and navigates around the daytime furniture.
 
-The **1080×1920 portrait display** receives its own matching window composition:
-an ordinary rectangular arena-style window with cream curtains, golden school
-rooftops by day, and a magenta-and-indigo galaxy at night. Gentle illumination
-and floating dust or starlight are animated inside the MP4 itself. The window
-frame and room structure stay fixed.
+The **1080×1920 portrait display** receives its own furnished window composition,
+with the same rectangular frame, cream curtains, and room geometry across themes.
+By day, a pink star planter, mint pencil cup, pastel books, and a wing-trimmed pink
+satchel sit on the sill; white-and-pink trainers rest on the floor. Visible dust
+and warm sunshafts move through the golden light.
+
+At night, a cyan-purple plant, star lantern, open spellbook, and pink star crystal
+light the sill. The bag moves to the left floor and violet light reflects from
+the shoes. Four-point glints, orbiting gold stars, cyan-pink trails, and local prop
+glows animate the scene. These effects are encoded into the MP4; the illustrated
+props and window structure remain still within each theme. The main arena,
+24 daytime desks, bench icon positions, and Lux are unchanged from v2.1.
 
 Defaults are **day 07:00–19:00**, night outside those hours, an **8-second
 crossfade**, and **35% main-display soundtrack volume**. Both displays use the
@@ -101,23 +108,24 @@ the live 3D companion as the moving character.
 
 The portrait window MP4s are **1440×2560, 30 fps, 24-second seamless loops**.
 They are upscaled from **941×1672 generated illustration masters**; the output
-resolution does not imply native 1440×2560 source detail. Their illumination and
-floating particles are encoded motion, while the illustrated structure stays
-fixed. The standalone window MP4s are silent, fixed-theme loops. The Lively ZIP
+resolution does not imply native 1440×2560 source detail. Procedural lighting,
+dust, glints, stars, and trails are encoded motion; the furnishings are part of
+the fixed illustrations. The standalone window MP4s are silent, fixed-theme loops. The Lively ZIP
 provides clock-based switching and separate full-length OGG music playback.
 [Artwork process and masters](docs/ARTWORK.md) ·
 [Window artwork prompts](docs/WINDOW-ART-PROMPTS.md).
 
 The [v1.0 landscape MP4 exports](https://github.com/teykaijun/everything-goes-on-wallpaper/releases/tag/v1.0.0)
-remain unchanged. The earlier v2.0 magical-study masters and package are retained
-locally as historical backups; v2.1 uses the window composition. Original game
-loops and artwork masters are retained when rebuilding the current media.
+remain unchanged. The earlier v2.0 magical-study and v2.1 plain-window masters
+are retained locally as historical sources. Version 2.2 uses the furnished
+window masters in `wallpaper/media/window-magic/`. Original game loops and
+earlier artwork masters are retained when rebuilding the current media.
 
 ## Build locally
 
 Requirements: Windows, Python 3.10+, Node.js with npm, the **.NET 10 SDK**, and
-FFmpeg with H.264, VP9, AAC, Vorbis, and drawtext support. The window builder uses
-Windows' Segoe UI font. Lux conversion uses the separate
+FFmpeg with H.264, VP9, AAC, and Vorbis support. The window builder uses
+Pillow and imageio-ffmpeg. Lux conversion uses the separate
 [lol2gltf release 2025-02-28-d36a532](https://github.com/Crauzer/lol2gltf/releases/tag/2025-02-28-d36a532).
 Audio decoding uses [vgmstream CLI](https://github.com/vgmstream/vgmstream/releases).
 The endpoint reader restores **LeagueToolkit 4.1.0-beta.53** from NuGet on its first
@@ -129,7 +137,7 @@ Run these commands from the repository root.
 
 ```powershell
 npm ci
-python -m pip install zstandard imageio-ffmpeg
+python -m pip install zstandard imageio-ffmpeg Pillow
 ```
 
 Put the official reveal at `.sources/official-reveal.mp4`. Extract music from
@@ -166,7 +174,7 @@ endpoint and preserves the original duration before writing the GLB and
 
 Supply the cleanup PNGs and the two window masters listed in
 [ARTWORK.md](docs/ARTWORK.md). The current window masters are
-`wallpaper/media/window/day.png` and `wallpaper/media/window/night.png`.
+`wallpaper/media/window-magic/day.png` and `wallpaper/media/window-magic/night.png`.
 
 ```powershell
 python scripts/build_v2_media.py --only arena
@@ -176,8 +184,13 @@ python scripts/build_window_media.py both
 The first command creates `day-clean.webm` and `night-clean.webm` from the retained
 arena loops and cleanup plates. The second creates the animated window
 `day.mp4` and `night.mp4` beside their PNG masters. Pass `day` or `night` instead
-of `both` to rebuild one window loop. The older `build_v2_media.py --only study`
-path is retained for reproducing the historical v2.0 study assets.
+of `both` to rebuild one window loop. `scripts/window_effects.py` draws the
+procedural RGBA effects; the builder composites them over the unchanged masters.
+Use `--preview-times 0,6,12,18` to save representative frames, `--output-dir PATH`
+for a separate output folder. To read the retained v2.1 masters without replacing
+their historical videos, combine `--media-dir wallpaper/media/window` with a
+separate `--output-dir build/window-legacy-preview`. The older `build_v2_media.py --only study` path reproduces
+the historical v2.0 study assets.
 
 ### Checks and package
 
@@ -188,7 +201,7 @@ dotnet build scripts/desktop-layout/DesktopLayout.csproj --configuration Release
 .\scripts\desktop-layout\Test-ReadOnly.ps1
 ```
 
-The Lively output is `dist/Everything-Goes-On-Bench-Window-Lively.zip`.
+The Lively output is `dist/Everything-Goes-On-Star-Window-Lively.zip`.
 Desktop helper checks perform inventory and dry-runs and verify that icon
 positions remain unchanged. Game files are read without modifying the
 installation. Game media, generated masters, local backups, and build packages

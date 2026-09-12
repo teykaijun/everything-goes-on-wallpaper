@@ -2,7 +2,8 @@
 
 This personal fan wallpaper combines the **Everything Goes On** arena and
 **Chibi Star Guardian Lux** from Teamfight Tactics with original furniture and
-generated portrait artwork. It is not an official Riot Games product.
+generated portrait artwork. The current release is **v2.2.0 — Star Window**.
+It is not an official Riot Games product.
 
 ## Arena footage and design references
 
@@ -15,7 +16,7 @@ Arena loops use reveal sections at 00:06–00:15 (classroom/day) and 00:19–00:
 (starry alternate dimension/night), with a one-second tail-to-head dissolve.
 The 1920×1080, 30 fps source is scaled to 2560×1440 with Lanczos.
 
-Version 2.1 adds 24 distinct vector desks in a four-by-six daytime classroom,
+Version 2.1 added 24 distinct vector desks in a four-by-six daytime classroom,
 with individual bags and accessories. Furniture and props are authored in
 `wallpaper/classroom.js`; they are original adaptations inspired by the reference,
 not extracted Riot furniture meshes. The added desks and chairs fade out at
@@ -31,23 +32,33 @@ The small Lux already baked into the arena footage is removed with a generated
 cleanup plate composited only within x=400, y=808, width=208, height=166 in the
 2560×1440 output. The remaining arena composition uses the original footage.
 
-The portrait monitor uses a separate pair of generated window illustrations:
-an ordinary rectangular arena-style window with cream curtains, golden school
-rooftops by day, and a magenta-and-indigo galaxy at night. The aligned masters
-are `wallpaper/media/window/day.png` and `night.png`, both 941×1672.
-`scripts/build_window_media.py` upscales them to 1440×2560 and encodes 24-second,
-30 fps MP4 loops with subtle repeating illumination and floating dust/starlight.
-The structural artwork stays fixed; the light and particle motion are encoded
-inside the video. These are upscaled outputs, not native 1440×2560 illustrations.
-The standalone window MP4s are silent; the live package plays its separate music
-loops and changes theme using the local clock.
+Version 2.2 replaces the portrait video with furnished window illustrations made
+with the built-in `image_gen` tool. The aligned masters are
+`wallpaper/media/window-magic/day.png` and `night.png`, both **941×1672**.
+The day sill holds a pink star planter, mint pencil cup, pastel books, and a
+wing-trimmed pink satchel; white-and-pink trainers sit on the right floor.
+At night, a glowing cyan-purple plant, cyan star lantern, open spellbook, and
+pink star crystal light the sill. The bag moves to the left floor and violet
+light reflects on the shoes. The rectangular frame and cream-curtain geometry
+remain aligned across the golden and cosmic palettes.
+
+`scripts/build_window_media.py` uses Pillow, imageio-ffmpeg, and the original
+procedural effects in `scripts/window_effects.py` to encode silent **24-second,
+30 fps, 1440×2560** MP4s. Day effects include visible floating dust and sunshafts;
+night effects include four-point glints, orbiting gold stars with cyan-pink
+trails, and local prop glows. The structure and props are fixed illustrations;
+lighting and particles are actual encoded motion. These effects are original
+wallpaper code, not extracted Riot particle assets. Output resolution exceeds
+the masters and should not be described as native 1440×2560 source detail.
+The live package supplies separate music and clock-based theme switching.
 [Artwork masters and process](ARTWORK.md) ·
 [Window artwork prompts](WINDOW-ART-PROMPTS.md).
 
-The v1.0 MP4 exports remain unchanged. The earlier v2.0 magical-study masters and
-package are retained locally as historical backups. The v2.1 Bench & Window
-package uses the new window videos, daytime furniture, bench icon layout,
-cleanup, and live character composition.
+The v1.0 landscape MP4 exports remain unchanged. Earlier v2.0 magical-study and
+v2.1 plain-window masters are retained locally as historical sources. The v2.2
+Star Window package uses the furnished window loops; its main arena, 24 daytime
+desks, 40 bench icon positions, cleanup patch, and native Lux remain unchanged
+from v2.1.
 
 ## Native Chibi Star Guardian Lux
 

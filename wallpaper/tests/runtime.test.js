@@ -222,8 +222,8 @@ test("portrait uses the matching arena-window scene and starts its soundtrack mu
   const env = environment(22,{audioMode:"separate"},{width:1080,height:1920});
   await flush();
   assert.equal(env.document.documentElement.dataset.scene,"window");
-  assert.equal(env.elements.night.children[0].src,"media/window/night.mp4");
-  assert.equal(env.elements.day.children[0].src,"media/window/day.mp4");
+  assert.equal(env.elements.night.children[0].src,"media/window-magic/night.mp4");
+  assert.equal(env.elements.day.children[0].src,"media/window-magic/day.mp4");
   assert.equal(env.elements["night-audio"].volume,0);
   assert.equal(env.elements.day.playCalls,0);
 });

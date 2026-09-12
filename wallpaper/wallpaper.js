@@ -3,7 +3,7 @@
   var schedule = window.WallpaperSchedule;
   var config = window.WALLPAPER_CONFIG || {};
   var isPortraitWindow = window.innerHeight > window.innerWidth;
-  if (isPortraitWindow) config = Object.assign({}, config, {daySources:["media/window/day.mp4"], nightSources:["media/window/night.mp4"], volume:0, luxEnabled:false});
+  if (isPortraitWindow) config = Object.assign({}, config, {daySources:["media/window-magic/day.mp4"], nightSources:["media/window-magic/night.mp4"], volume:0, luxEnabled:false});
   document.documentElement.dataset.scene = isPortraitWindow ? "window" : "classroom";
   var settings = schedule.normalize(config);
   var phases = ["day", "night"];
