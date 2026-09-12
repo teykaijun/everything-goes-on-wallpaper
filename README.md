@@ -6,6 +6,9 @@ Windows clock.
 
 ## Use the wallpaper
 
+Download the ready-to-use ZIP or MP4s from the
+[latest release](https://github.com/teykaijun/everything-goes-on-wallpaper/releases/latest).
+
 1. Install [Lively Wallpaper](https://www.rocksdanister.com/lively/).
 2. Drag `dist/Everything-Goes-On-2K-Lively.zip` into Lively, or use **Add wallpaper → Choose a file**.
 3. Apply it. Right-click its library card and choose **Customize** to change the schedule and volume.
