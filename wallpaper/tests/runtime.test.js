@@ -23,6 +23,7 @@ function environment(hour = 22, overrides = {}, behavior = {}) {
     return elements[id] ||= {
       style: {}, children: [], listeners: {}, paused: true, muted: false,
       volume: 1, playCalls: 0, pauseCalls: 0,
+      setAttribute(name, value) { this[name] = value; },
       appendChild(child) { this.children.push(child); },
       addEventListener(type, listener) { this.listeners[type] = listener; },
       play() {
@@ -37,14 +38,17 @@ function environment(hour = 22, overrides = {}, behavior = {}) {
   const windowEvents = {};
   const document = {
     hidden: false,
+    documentElement: {dataset:{}},
     getElementById: element,
     createElement: () => ({}),
     addEventListener: (type, callback) => { documentEvents[type] = callback; }
   };
   const window = {
+    innerWidth: behavior.width || 2560, innerHeight: behavior.height || 1440,
     WallpaperSchedule: schedule,
     WALLPAPER_CONFIG: overrides,
-    location: { search: "" },
+    location: { search: "", reload() { this.reloaded = true; } },
+    ArenaLayout: behavior.layout, ChibiLux: behavior.lux,
     addEventListener: (type, callback) => { windowEvents[type] = callback; }
   };
   vm.runInNewContext(source, {
@@ -211,4 +215,52 @@ test("a browser blocking even muted audio asks for a gesture instead of reportin
   assert.match(env.elements["media-status"].textContent, /allow audio in this browser/);
   assert.equal(env.elements["enable-audio"].textContent, "Enable soundtrack");
   assert.equal(env.elements["enable-audio"].hidden, false);
+});
+
+
+test("portrait uses the separate study scene and starts its soundtrack muted", async () => {
+  const env = environment(22,{audioMode:"separate"},{width:1080,height:1920});
+  await flush();
+  assert.equal(env.document.documentElement.dataset.scene,"study");
+  assert.equal(env.elements.night.children[0].src,"media/study/night.mp4");
+  assert.equal(env.elements.day.children[0].src,"media/study/day.mp4");
+  assert.equal(env.elements["night-audio"].volume,0);
+  assert.equal(env.elements.day.playCalls,0);
+});
+
+test("landscape retains cleaned arena sources and configured music",async()=>{
+  const env=environment(12,{daySources:["media/day-clean.webm"],nightSources:["media/night-clean.webm"],audioMode:"separate",volume:35});
+  await flush();
+  assert.equal(env.document.documentElement.dataset.scene,"classroom");
+  assert.equal(env.elements.day.children[0].src,"media/day-clean.webm");
+  assert.ok(env.elements["day-audio"].volume>0);
+});
+
+
+test("desktop emote menu opens and forwards each selected native emote", async () => {
+  const commands = [];
+  const env = environment(22, {}, {
+    layout: { create: () => ({setPaused(){}, refresh(){}, setMix(){}}) },
+    lux: { create: () => ({setPaused(){}, command: name => commands.push(name)}) }
+  });
+  const menu = env.elements["emote-menu"];
+  const toggle = env.elements["emote-toggle"];
+  assert.equal(menu.hidden, true);
+  toggle.listeners.click();
+  assert.equal(menu.hidden, false);
+  assert.equal(toggle["aria-expanded"], "true");
+  for (const emote of ["dance", "laugh", "taunt", "joke", "stop"]) {
+    menu.listeners.click({target:{closest: () => ({dataset:{emote}})}});
+  }
+  assert.deepEqual(commands, ["dance", "laugh", "taunt", "joke", "stop"]);
+});
+
+test("moving the wallpaper between landscape and portrait reloads its scene", () => {
+  const env = environment(22);
+  env.windowEvents.resize();
+  assert.equal(env.window.location.reloaded, undefined);
+  env.window.innerWidth = 1080;
+  env.window.innerHeight = 1920;
+  env.windowEvents.resize();
+  assert.equal(env.window.location.reloaded, true);
 });

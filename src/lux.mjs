@@ -1,120 +1,253 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-function clamp(v,a,b){return Math.max(a,Math.min(b,Number(v)));}
-function angleDelta(a,b){return Math.atan2(Math.sin(b-a),Math.cos(b-a));}
+const clamp=(value,min,max)=>Math.max(min,Math.min(max,Number(value)||min));
+const NATIVE_BODY_HEIGHT=166.656175;
+const NATIVE_BODY_HEIGHTS_PER_SECOND=2.4;
 
-window.ChibiLux={create({element,layout,getState,enabled=true,size=100,speed=100}){
+window.ChibiLux={create({element,layout,getState,enabled=true,size=100,speed=100,interactions=true}){
+  const motion=window.LuxMotion;
   let destroyed=false,paused=false,loaded=false,failed=false,frame=0,last=0,elapsed=0;
-  let settings={enabled:enabled!==false,size:clamp(size,65,160),speed:clamp(speed,50,150)};
-  let mixer,actor,walk,idle,currentAction=null,lastDirection=0;
-  const sprite=document.createElement('div');
-  sprite.className='lux-character';
+  const settings={enabled:enabled!==false,size:clamp(size,45,160),speed:clamp(speed,50,150),interactions:interactions!==false};
+  let mixer,actor,currentAction=null,currentClip='',sequencer,navigator,environment;
+  let currentRunRate=1;
+  let previousPhase='idle',automaticWait=3,activityCount=0,emoteIndex=0,lastVisit=-1,afterArrival=null;
+  let viewport={width:innerWidth,height:innerHeight},renderWidth=0,renderHeight=0,hitBox=null,lastPointer=null;
+  const clips=new Map(),actions=new Map(),managedMaterials=[];
+  const metadata=window.LUX_ANIMATION_DATA||{initialVisible:['Body','Weapons','Face_Basic','Face_Basic_Eyes'],clips:{},faceRenderOrder:[]};
+  const emotes=['dance','laugh','taunt','joke'];
+  const sprite=document.createElement('div');sprite.className='lux-character';
   const shadow=document.createElement('div');shadow.className='lux-shadow';
   sprite.appendChild(shadow);element.appendChild(sprite);
+  // Furniture and Lux share the arena's depth ordering, one layer per foot position.
+  element.style.zIndex='auto';
   let renderer;
   try{renderer=new THREE.WebGLRenderer({alpha:true,antialias:true,powerPreference:'low-power'});}
-  catch(error){console.warn('Lux WebGL renderer could not start',error);failed=true;return {setPaused(){},configure(){},destroy(){sprite.remove();},status(){return {loaded:false,failed:true};}};}
+  catch(error){console.warn('Lux WebGL renderer could not start',error);return {setPaused(){},configure(){},destroy(){sprite.remove();},status(){return {loaded:false,failed:true};}};}
   renderer.setClearColor(0x000000,0);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));
-  renderer.outputColorSpace=THREE.SRGBColorSpace;
-  renderer.toneMapping=THREE.NoToneMapping;
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.25));
+  renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.NoToneMapping;
   renderer.domElement.className='lux-canvas';sprite.appendChild(renderer.domElement);
   const scene=new THREE.Scene();
-  const camera=new THREE.OrthographicCamera(-1.65,1.65,2.0,-2.0,.1,100);
-  camera.position.set(0,3.8,7);camera.lookAt(0,1.05,0);camera.updateMatrixWorld(true);
+  // Match the arena's elevated camera and allow room for the native staff/Pet emotes.
+  const camera=new THREE.OrthographicCamera(-2.3,2.3,2.4,-2.4,.1,100);
+  const elevation=THREE.MathUtils.degToRad(54),cameraDistance=9;
+  camera.position.set(0,1+Math.sin(elevation)*cameraDistance,Math.cos(elevation)*cameraDistance);
+  camera.lookAt(0,1,0);camera.updateMatrixWorld(true);
   const ambient=new THREE.AmbientLight(0xffffff,2.3);scene.add(ambient);
   const light=new THREE.DirectionalLight(0xfff2e4,2.0);light.position.set(-3,7,5);scene.add(light);
   const rim=new THREE.DirectionalLight(0xb0bfff,.6);rim.position.set(3,3,-2);scene.add(rim);
   const pivot=new THREE.Group();scene.add(pivot);
-  const foot=new THREE.Vector3(0,0,0).project(camera);
-  const footX=(foot.x+1)/2,footY=(1-foot.y)/2;
-  let renderWidth=0,renderHeight=0;
+  const foot=new THREE.Vector3(0,0,0).project(camera),footX=(foot.x+1)/2,footY=(1-foot.y)/2;
+  const bodyProjectionFraction=2*Math.cos(elevation)/(camera.top-camera.bottom);
 
-  function setAction(action){
-    if(!action||action===currentAction)return;
-    action.reset().setEffectiveTimeScale(1).setEffectiveWeight(1).play();
-    if(currentAction) action.crossFadeFrom(currentAction,.28,true);
-    currentAction=action;
+  function scenery(){return window.ClassroomScene||{};}
+  function bodyHeight(y){
+    const rect=layout.getRect(),bounds=environment?.bounds||{y:rect.y,height:rect.height};
+    const depth=clamp((y-bounds.y)/Math.max(1,bounds.height),0,1);
+    return rect.height*.08*(.88+depth*.18)*settings.size/100;
+  }
+  function readEnvironment(){
+    const classroom=scenery(),rect=layout.getRect();
+    let polygon=classroom.getWalkablePolygon?.();
+    const bounds=classroom.getBounds?.();
+    if(!polygon?.length&&!bounds){
+      polygon=[[0,0],[1,0],[1,1],[0,1]].map(([u,v])=>window.ArenaLayout.groundToScreen(u,v,innerWidth,innerHeight));
+    }
+    return {polygon,bounds,obstacles:classroom.getObstacles?.()||[],waypoints:classroom.getWaypoints?.()||[],padding:Math.max(6,rect.height*.08*1.06*settings.size/100*.1)};
+  }
+  function resize(){
+    const oldViewport=viewport;viewport={width:innerWidth,height:innerHeight};
+    const options=readEnvironment();environment=motion.environment(options);
+    if(!navigator){
+      const start=window.ArenaLayout.groundToScreen(.5,.8,innerWidth,innerHeight);
+      navigator=motion.createNavigator({...options,position:start,speed:250,depthFactor:1/Math.sin(elevation)});
+    }else{
+      const point=navigator.snapshot();
+      navigator.setEnvironment(options,{x:point.x*viewport.width/Math.max(1,oldViewport.width),y:point.y*viewport.height/Math.max(1,oldViewport.height)});
+    }
+    renderWidth=0;last=0;
+  }
+  function setAction(state){
+    let action=actions.get(state.clip);
+    if(!action){const clip=clips.get(state.clip);if(!clip)return;action=mixer.clipAction(clip);actions.set(state.clip,action);}
+    if(action!==currentAction){
+      action.reset().setEffectiveWeight(1).setEffectiveTimeScale(1);
+      action.setLoop(state.loop?THREE.LoopRepeat:THREE.LoopOnce,state.loop?Infinity:1);
+      action.clampWhenFinished=true;action.play();
+      if(currentAction)action.crossFadeFrom(currentAction,state.clip==='IdleIn'?.12:.10,false);
+      currentAction=action;currentClip=state.clip;
+    }
+    action.setEffectiveTimeScale(state.command==='run'?currentRunRate:1);
+  }
+  function applyVisibility(state){
+    const visible=motion.visibilityFor(metadata,state.clip,state.time);
+    managedMaterials.forEach(({material,name})=>{material.visible=visible.has(name);});
+  }
+  function playEmote(name,facingPoint=null){
+    if(!sequencer||!navigator)return;
+    navigator.stop();afterArrival=null;previousPhase='idle';automaticWait=4+Math.random()*3;
+    const point=navigator.snapshot();navigator.lookAt(facingPoint||{x:point.x,y:point.y+bodyHeight(point.y)*2},12);
+    sequencer.play(name);sprite.dataset.command=name;sprite.dataset.interaction=facingPoint?'scenery':'viewer';
+  }
+  function visit(point){
+    if(!navigator.setTarget(point,point.kind||'aisle'))return false;
+    afterArrival=point.kind==='poro'?{name:'laugh',lookAt:point.lookAt}:point.kind==='desk'?{name:'joke',lookAt:point.lookAt}:null;
+    automaticWait=3+Math.random()*3;return true;
+  }
+  function chooseActivity(){
+    activityCount++;
+    if(activityCount%3===0){playEmote(emotes[emoteIndex++%emotes.length]);return;}
+    const point=navigator.snapshot(),candidates=environment.waypoints.filter(p=>navigator.canVisit(p)&&Math.hypot(p.x-point.x,p.y-point.y)>bodyHeight(point.y)*1.4);
+    const preferred=candidates.filter(p=>activityCount%2===0?p.kind==='desk':p.kind==='poro');
+    const choices=preferred.length?preferred:candidates;
+    for(let attempt=0;attempt<Math.min(choices.length,8);attempt++){
+      const index=Math.floor(Math.random()*choices.length);
+      if(index===lastVisit&&choices.length>1)continue;
+      if(visit(choices[index])){lastVisit=index;return;}
+    }
+    // Without furniture, visit different points on the actual arena floor.
+    for(let attempt=0;attempt<8;attempt++){
+      const next=window.ArenaLayout.groundToScreen(.1+Math.random()*.8,.1+Math.random()*.8,innerWidth,innerHeight);
+      if(visit(next))return;
+    }
+    automaticWait=4;
   }
   function tick(now){
     frame=0;
     if(destroyed||paused||!settings.enabled||!loaded)return;
-    const state=getState();
+    const state=getState()||{};
     if(state.paused){last=0;frame=requestAnimationFrame(tick);return;}
-    const dt=last?Math.min(.05,(now-last)/1000):0;last=now;
-    elapsed+=dt*settings.speed/100;
-    const pose=window.LuxMotion.poseAt(elapsed);
-    const rect=layout.getRect();
-    const ground=window.ArenaLayout.groundToScreen(pose.u,pose.v,innerWidth,innerHeight);
-    const ahead=window.ArenaLayout.groundToScreen(pose.u+pose.du*.02,pose.v+pose.dv*.02,innerWidth,innerHeight);
-    const dx=ahead.x-ground.x,dy=ahead.y-ground.y;
-    const direction=Math.atan2(dx,dy*1.5);
-    if(pose.walking)lastDirection+=angleDelta(lastDirection,direction)*Math.min(1,dt*7);
-    pivot.rotation.y=lastDirection;
-    const height=Math.round(rect.height*.175*(.87+pose.v*.18)*settings.size/100);
-    const width=Math.round(height*.825);
+    // The source game animation and arena are 30fps; avoid unnecessary 60fps WebGL work.
+    if(last&&now-last<1000/30-.5){frame=requestAnimationFrame(tick);return;}
+    const dt=last?Math.min(.1,(now-last)/1000):0;last=now;elapsed+=dt;
+    const before=navigator.snapshot(),heightOnFloor=bodyHeight(before.y);
+    navigator.setSpeed(heightOnFloor*NATIVE_BODY_HEIGHTS_PER_SECOND*settings.speed/100);
+    const pose=navigator.update(dt);
+    const bodyPixels=bodyHeight(pose.y);
+    currentRunRate=motion.strideTimeScale(heightOnFloor*NATIVE_BODY_HEIGHTS_PER_SECOND*settings.speed/100,bodyPixels,pose.yaw,elevation);
+    if(pose.walking)sequencer.play('run');
+    else if(previousPhase==='walking'||pose.arrived)sequencer.play('stop');
+    previousPhase=pose.phase;
+    let animation=sequencer.update(dt*(sequencer.snapshot().command==='run'?currentRunRate:1));
+    if(!pose.moving&&!animation.busy){
+      if(afterArrival){const visitAction=afterArrival;afterArrival=null;playEmote(visitAction.name,visitAction.lookAt);animation=sequencer.snapshot();}
+      else{
+        automaticWait-=dt;
+        if(automaticWait<=0){chooseActivity();animation=sequencer.snapshot();}
+      }
+    }
+    const height=Math.round(bodyPixels/bodyProjectionFraction),width=Math.round(height*(camera.right-camera.left)/(camera.top-camera.bottom));
     if(width!==renderWidth||height!==renderHeight){
       renderWidth=width;renderHeight=height;renderer.setSize(width,height,false);
       sprite.style.width=width+'px';sprite.style.height=height+'px';
     }
-    sprite.style.transform=`translate3d(${ground.x-width*footX}px,${ground.y-height*footY}px,0)`;
+    pivot.rotation.y=pose.yaw;
+    sprite.style.transform=`translate3d(${pose.x-width*footX}px,${pose.y-height*footY}px,0)`;
+    sprite.style.zIndex=String(Math.round(pose.y)+10);
     shadow.style.left=(footX*100)+'%';shadow.style.top=(footY*100)+'%';
+    shadow.style.width=(bodyPixels*.63/width*100)+'%';shadow.style.height=(bodyPixels*.12/height*100)+'%';
     const night=state.nightMix||0;
-    shadow.style.opacity=String(.2-night*.08);
-    light.color.setRGB(1,.96-night*.09,.90+night*.10);
-    rim.intensity=.45+night*.55;
-    setAction(pose.walking?walk:idle);
-    sprite.dataset.animation=pose.walking?'walk':'idle';
-    sprite.dataset.ready='true';
-    if(walk)walk.setEffectiveTimeScale((.55+pose.pace*.38)*settings.speed/100);
-    mixer.update(dt);
-    renderer.render(scene,camera);
+    shadow.style.opacity=String(.25-night*.08);light.color.setRGB(1,.96-night*.09,.90+night*.10);rim.intensity=.45+night*.55;
+    hitBox={x:pose.x-bodyPixels*.62,y:pose.y-bodyPixels*1.23,width:bodyPixels*1.24,height:bodyPixels*1.4};
+    setAction(animation);mixer.update(dt);applyVisibility({...animation,time:currentAction?.time||0});renderer.render(scene,camera);
+    sprite.dataset.animation=animation.clip;sprite.dataset.ready='true';sprite.dataset.motion=pose.phase;
     frame=requestAnimationFrame(tick);
   }
   function restart(){
-    sprite.hidden=!settings.enabled;
+    sprite.hidden=!settings.enabled||failed;
     if(!frame&&!paused&&settings.enabled&&loaded){last=0;frame=requestAnimationFrame(tick);}
   }
+  function ignoredPointer(event){
+    return !settings.interactions||paused||!loaded||!settings.enabled||(getState()||{}).paused||event.target?.closest?.('[data-lux-ui],#preview-panel,button,input,select,textarea,a');
+  }
+  function pointerMove(event){
+    if(ignoredPointer(event))return;
+    const point={x:event.clientX,y:event.clientY};if(!Number.isFinite(point.x)||!Number.isFinite(point.y))return;
+    lastPointer=point;
+    const pose=navigator.snapshot();
+    if(!pose.moving&&!sequencer.snapshot().busy&&Math.hypot(point.x-pose.x,point.y-pose.y)<bodyHeight(pose.y)*2.8){navigator.lookAt(point,1.1);automaticWait=Math.max(automaticWait,1.5);}
+  }
+  function pointerClick(event){
+    if(ignoredPointer(event)||(event.button!==undefined&&event.button!==0))return;
+    const point={x:event.clientX,y:event.clientY};if(!Number.isFinite(point.x)||!Number.isFinite(point.y)||scenery().isIconPoint?.(point.x,point.y))return;
+    lastPointer=point;
+    if(hitBox&&motion.insideRect(point,hitBox)){playEmote(emotes[emoteIndex++%emotes.length]);return;}
+    if(visit(point)){afterArrival=null;sequencer.play('stop');automaticWait=6;}
+  }
+  function commandEvent(event){
+    if(!loaded||!settings.enabled||paused)return;
+    const name=String(event.detail?.name||'').toLowerCase();
+    if(name==='come-here'){
+      const point=Number.isFinite(event.detail?.x)&&Number.isFinite(event.detail?.y)?event.detail:lastPointer;
+      if(point&&!scenery().isIconPoint?.(point.x,point.y))visit(point);
+    }else if(name==='stop'){navigator.stop();afterArrival=null;sequencer.play('stop');automaticWait=8;}
+    else if(['dance','laugh','taunt','joke','laugh-wacky'].includes(name))playEmote(name);
+  }
+  function disposeModel(){
+    actor?.traverse(object=>{
+      if(!object.isMesh)return;object.geometry?.dispose();
+      (Array.isArray(object.material)?object.material:[object.material]).forEach(material=>{
+        Object.values(material).forEach(value=>{if(value?.isTexture)value.dispose();});material.dispose();
+      });
+    });
+  }
+  window.addEventListener('resize',resize);
+  window.addEventListener('classroom-layout',resize);
+  window.addEventListener('lux-command',commandEvent);
+  document.addEventListener('mousemove',pointerMove,{passive:true});
+  document.addEventListener('click',pointerClick,{passive:true});
+  resize();
   const data=window.LUX_MODEL_BASE64;
-  if(!data){failed=true;console.warn('The local Lux model is missing.');}
-  else {
+  if(!data){failed=true;sprite.hidden=true;console.warn('The local Lux model is missing.');}
+  else{
     const binary=atob(data),bytes=new Uint8Array(binary.length);
     for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
     new GLTFLoader().parse(bytes.buffer,'',gltf=>{
-      if(destroyed)return;
+      if(destroyed){actor=gltf.scene;disposeModel();return;}
       actor=gltf.scene;
-      const box=new THREE.Box3().setFromObject(actor),extent=box.getSize(new THREE.Vector3());
-      const scale=2.0/extent.y;
-      const normalize=new THREE.Group();normalize.scale.setScalar(scale);
-      actor.position.x-=(box.min.x+box.max.x)/2;
-      // The native animated rig is grounded at Y=0; bind-pose bounds include
-      // parts below the feet, so using their minimum would make Lux float.
-      actor.position.y=0;
-      actor.position.z-=(box.min.z+box.max.z)/2;
-      normalize.add(actor);pivot.add(normalize);
-      actor.traverse(obj=>{
-        if(obj.isMesh){obj.frustumCulled=false;const mats=Array.isArray(obj.material)?obj.material:[obj.material];
-          mats.forEach(mat=>{if(mat.metalness!==undefined)mat.metalness=0;if(mat.roughness!==undefined)mat.roughness=1; if(mat.name.startsWith('Face_')) { mat.depthWrite=false; obj.renderOrder=mat.name==='Face_Basic_Eyes'?2:1; }});}
+      const normalize=new THREE.Group();normalize.scale.setScalar(2/NATIVE_BODY_HEIGHT);
+      // Native ground is Y=0. Both the root and floor bone bounce during the run;
+      // rebasing to a bind-pose minimum or foot bone would cancel the genuine motion.
+      actor.position.set(0,0,0);normalize.add(actor);pivot.add(normalize);
+      const controlled=new Set([...(metadata.initialVisible||[]),...(metadata.faceRenderOrder||[]),'Pet']);
+      Object.values(metadata.clips||{}).forEach(clip=>(clip.visibility||[]).forEach(event=>[...(event.show||[]),...(event.hide||[])].forEach(name=>controlled.add(name))));
+      actor.traverse(object=>{
+        if(!object.isMesh)return;object.frustumCulled=false;
+        const materials=Array.isArray(object.material)?object.material:[object.material];
+        materials.forEach(material=>{
+          if(material.metalness!==undefined)material.metalness=0;if(material.roughness!==undefined)material.roughness=1;
+          if(controlled.has(material.name))managedMaterials.push({material,name:material.name});
+          const order=(metadata.faceRenderOrder||[]).indexOf(material.name);
+          if(order>=0){material.depthWrite=false;object.renderOrder=order+1;}
+        });
       });
+      gltf.animations.forEach(clip=>clips.set(clip.name,clip));
+      const run=[...clips.keys()].find(name=>/^run$/i.test(name)),idle=[...clips.keys()].find(name=>/^idle$/i.test(name));
+      if(!run||!idle){failed=true;sprite.hidden=true;console.warn('Lux requires the native Run and Idle clips.');return;}
       mixer=new THREE.AnimationMixer(actor);
-      const walkClip=gltf.animations.find(c=>/walk|run|move/i.test(c.name));
-      const idleClip=gltf.animations.find(c=>/idle/i.test(c.name));
-      if(!walkClip||!idleClip){failed=true;console.warn('Lux requires both walking and idle clips.');return;}
-      walk=mixer.clipAction(walkClip);idle=mixer.clipAction(idleClip);
-      setAction(idle);loaded=true;restart();
-    },error=>{failed=true;console.warn('Lux could not load',error);});
+      sequencer=motion.createSequencer(Object.fromEntries([...clips].map(([name,clip])=>[name,clip.duration])));
+      setAction(sequencer.snapshot());applyVisibility(sequencer.snapshot());loaded=true;restart();
+    },error=>{failed=true;sprite.hidden=true;console.warn('Lux could not load',error);});
   }
   return {
     setPaused(value){paused=Boolean(value);if(paused){cancelAnimationFrame(frame);frame=0;last=0;}else restart();},
-    configure(options){
+    configure(options={}){
       if('enabled'in options)settings.enabled=Boolean(options.enabled);
-      if('size'in options)settings.size=clamp(options.size,65,160);
+      if('size'in options)settings.size=clamp(options.size,45,160);
       if('speed'in options)settings.speed=clamp(options.speed,50,150);
+      if('interactions'in options)settings.interactions=Boolean(options.interactions);
+      if('size'in options)resize();
       if(!settings.enabled){cancelAnimationFrame(frame);frame=0;}
       restart();
     },
-    status(){return {loaded,failed,paused,enabled:settings.enabled,elapsed,clips:{walk:walk?.getClip().name,idle:idle?.getClip().name}};},
-    destroy(){destroyed=true;cancelAnimationFrame(frame);renderer.dispose();sprite.remove();}
+    command(name){commandEvent({detail:{name}});},
+    status(){return {loaded,failed,paused,enabled:settings.enabled,interactions:settings.interactions,elapsed,animation:currentClip,runTimeScale:currentRunRate,navigation:navigator?.snapshot(),clips:{walk:[...clips.keys()].find(name=>/^run$/i.test(name)),idle:[...clips.keys()].find(name=>/^idle$/i.test(name))}};},
+    destroy(){
+      destroyed=true;cancelAnimationFrame(frame);
+      window.removeEventListener('resize',resize);window.removeEventListener('classroom-layout',resize);window.removeEventListener('lux-command',commandEvent);
+      document.removeEventListener('mousemove',pointerMove);document.removeEventListener('click',pointerClick);
+      mixer?.stopAllAction();disposeModel();renderer.dispose();sprite.remove();
+    }
   };
 }};

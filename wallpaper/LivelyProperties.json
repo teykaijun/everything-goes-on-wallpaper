@@ -65,5 +65,10 @@
     "max": 150,
     "step": 5,
     "text": "Lux walking speed (%)"
+  },
+  "luxInteractions": {
+    "type": "checkbox",
+    "value": true,
+    "text": "Lux reacts to cursor, clicks and scenery"
   }
 }

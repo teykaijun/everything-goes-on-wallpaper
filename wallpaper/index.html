@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark">
   <title>Everything Goes On · TFT Arena</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=2.0.0-final">
+  <link rel="stylesheet" href="classroom.css?v=2.0.0-final">
 </head>
 <body>
   <main id="arena" aria-label="Everything Goes On arena wallpaper">
@@ -14,10 +15,20 @@
       <video id="day" loop playsinline preload="none" disablepictureinpicture aria-hidden="true"></video>
       <video id="night" loop playsinline preload="none" disablepictureinpicture aria-hidden="true"></video>
     </div>
+    <div id="study-atmosphere" aria-hidden="true"></div>
+    <div id="classroom-desks" aria-hidden="true"></div>
     <div id="lux-layer" aria-hidden="true"></div>
     <audio id="day-audio" loop preload="none"></audio>
     <audio id="night-audio" loop preload="none"></audio>
   </main>
+  <nav id="lux-emotes" data-lux-ui aria-label="Lux emotes">
+    <button id="emote-toggle" aria-label="Show Lux emotes" aria-expanded="false" title="Lux emotes">&#10022;</button>
+    <div id="emote-menu" hidden>
+      <button data-emote="dance">Dance</button><button data-emote="laugh">Laugh</button>
+      <button data-emote="taunt">Taunt</button><button data-emote="joke">Joke</button>
+      <button data-emote="stop">Rest</button>
+    </div>
+  </nav>
   <aside id="preview-panel" hidden aria-label="Wallpaper preview settings">
     <p class="eyebrow">TEAMFIGHT TACTICS / ARENA</p>
     <h1>Everything<br>Goes On</h1>
@@ -39,12 +50,14 @@
     <p id="media-status" role="status"></p>
     <p class="footnote">Preview controls are hidden on your desktop.<br>Use Lively's Customize menu to save your settings.</p>
   </aside>
-  <script src="config.js"></script>
-  <script src="schedule.js"></script>
-  <script src="layout.js"></script>
-  <script src="lux-motion.js"></script>
-  <script src="media/lux/model.js"></script>
-  <script src="lux.js"></script>
-  <script src="wallpaper.js"></script>
+  <script src="config.js?v=2.0.0-final"></script>
+  <script src="schedule.js?v=2.0.0-final"></script>
+  <script src="layout.js?v=2.0.0-final"></script>
+  <script src="classroom.js?v=2.0.0-final"></script>
+  <script src="lux-motion.js?v=2.0.0-final"></script>
+  <script src="media/lux/model.js?v=2.0.0-final"></script>
+  <script src="media/lux/animation-data.js?v=2.0.0-final"></script>
+  <script src="lux.js?v=2.0.0-final"></script>
+  <script src="wallpaper.js?v=2.0.0-final"></script>
 </body>
 </html>

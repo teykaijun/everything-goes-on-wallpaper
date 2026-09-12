@@ -1,0 +1,1024 @@
+{
+  "schemaVersion": 1,
+  "source": "Companions.wad.client / data/characters/petchibilux/animations/starguardian.bin",
+  "eventFramesPerSecond": 30,
+  "initialVisible": [
+    "Body",
+    "Weapons",
+    "Face_Basic",
+    "Face_Basic_Eyes"
+  ],
+  "faceRenderOrder": [
+    "Face_Basic",
+    "Face_Rainbow",
+    "Anger",
+    "Happy",
+    "Surprise",
+    "Sneeze",
+    "Wacky",
+    "Eyesclosed",
+    "Face_Basic_Eyes",
+    "Surprise_Eyes"
+  ],
+  "sequences": {
+    "Dance": [
+      "DanceIntro",
+      "DanceLoop"
+    ],
+    "Taunt": [
+      "TauntIntro",
+      "TauntLoop"
+    ],
+    "Cast": [
+      "Cast",
+      "CastLoop"
+    ],
+    "Stop": [
+      "IdleIn",
+      "Idle"
+    ]
+  },
+  "clips": {
+    "Idle": {
+      "sourceAnimation": "petchibilux_starguardian_idle.anm",
+      "graphClipHash": "{862df511}",
+      "loop": true,
+      "visibility": [],
+      "effects": [],
+      "sounds": [
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "name": "Play_sfx_pet_littlelegend_idle3d",
+          "isLoop": false
+        }
+      ]
+    },
+    "IdleIn": {
+      "sourceAnimation": "petchibilux_starguardian_idle_in.anm",
+      "graphClipHash": "{b781551b}",
+      "loop": false,
+      "visibility": [],
+      "effects": [],
+      "sounds": []
+    },
+    "Run": {
+      "sourceAnimation": "petchibilux_starguardian_run.anm",
+      "graphClipHash": "{f112f5b2}",
+      "loop": true,
+      "visibility": [],
+      "effects": [
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "effectKey": "{c8ba868b}",
+          "resourceHash": "{0954dd98}",
+          "resourceName": "PetChibiLux_Skin2_idle_Trail",
+          "bones": [
+            "L_Staff"
+          ],
+          "isLoop": false,
+          "isKillEvent": false,
+          "enabled": true
+        },
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "effectKey": "{c8ba868b}",
+          "resourceHash": "{0954dd98}",
+          "resourceName": "PetChibiLux_Skin2_idle_Trail",
+          "bones": [
+            "R_Staff"
+          ],
+          "isLoop": false,
+          "isKillEvent": false,
+          "enabled": true
+        }
+      ],
+      "sounds": []
+    },
+    "DanceIntro": {
+      "sourceAnimation": "petchibilux_starguardian_dance.anm",
+      "graphClipHash": "{e9e15d7a}",
+      "loop": false,
+      "visibility": [
+        {
+          "startFrame": 12.0,
+          "endFrame": 48.0,
+          "show": [
+            "Surprise",
+            "Surprise_Eyes"
+          ],
+          "hide": [
+            "Face_Basic",
+            "Face_Basic_Eyes"
+          ]
+        },
+        {
+          "startFrame": 49.0,
+          "endFrame": 71.0,
+          "show": [
+            "Anger"
+          ],
+          "hide": [
+            "Face_Basic",
+            "Face_Basic_Eyes"
+          ]
+        },
+        {
+          "startFrame": 72.0,
+          "endFrame": null,
+          "show": [
+            "Happy"
+          ],
+          "hide": [
+            "Face_Basic",
+            "Face_Basic_Eyes"
+          ]
+        },
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "show": [
+            "Pet"
+          ],
+          "hide": []
+        }
+      ],
+      "effects": [
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "effectKey": "{b7a216ce}",
+          "resourceHash": "{5998f10b}",
+          "resourceName": "PetChibiLux_Skin2_idle_Trail1",
+          "bones": [
+            "L_Staff"
+          ],
+          "isLoop": false,
+          "isKillEvent": false,
+          "enabled": true
+        },
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "effectKey": "{b7a216ce}",
+          "resourceHash": "{5998f10b}",
+          "resourceName": "PetChibiLux_Skin2_idle_Trail1",
+          "bones": [
+            "R_Staff"
+          ],
+          "isLoop": false,
+          "isKillEvent": false,
+          "enabled": true
+        },
+        {
+          "startFrame": 67.0,
+          "endFrame": null,
+          "effectKey": "{b2904c56}",
+          "resourceHash": "{47fb84a1}",
+          "resourceName": null,
+          "bones": [
+            "Buffbone_Glb_Ground_Loc"
+          ],
+          "isLoop": true,
+          "isKillEvent": false,
+          "enabled": true
+        },
+        {
+          "startFrame": 52.0,
+          "endFrame": null,
+          "effectKey": "{c8ba868b}",
+          "resourceHash": "{0954dd98}",
+          "resourceName": "PetChibiLux_Skin2_idle_Trail",
+          "bones": [
+            "L_Staff"
+          ],
+          "isLoop": true,
+          "isKillEvent": false,
+          "enabled": true
+        },
+        {
+          "startFrame": 72.0,
+          "endFrame": null,
+          "effectKey": "{396af780}",
+          "resourceHash": "{4605cebf}",
+          "resourceName": "PetChibiLux_Skin2_Emote_Dance_Hi",
+          "bones": [
+            "Head"
+          ],
+          "isLoop": true,
+          "isKillEvent": false,
+          "enabled": true
+        }
+      ],
+      "sounds": [
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "name": "Play_sfx_pet_littlelegend_dance_in3d",
+          "isLoop": false
+        }
+      ]
+    },
+    "DanceLoop": {
+      "sourceAnimation": "petchibilux_starguardian_dance_loop.anm",
+      "graphClipHash": "{1fcb6757}",
+      "loop": true,
+      "visibility": [
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "show": [
+            "Happy"
+          ],
+          "hide": [
+            "Face_Basic",
+            "Face_Basic_Eyes"
+          ]
+        },
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "show": [
+            "Pet"
+          ],
+          "hide": []
+        }
+      ],
+      "effects": [
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "effectKey": "{3ca9bd99}",
+          "resourceHash": "{00000000}",
+          "resourceName": null,
+          "bones": [
+            "Buffbone_Glb_Ground_Loc"
+          ],
+          "isLoop": false,
+          "isKillEvent": false,
+          "enabled": false
+        },
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "effectKey": "{b44c7707}",
+          "resourceHash": "{00000000}",
+          "resourceName": null,
+          "bones": [
+            "L_Staff"
+          ],
+          "isLoop": false,
+          "isKillEvent": false,
+          "enabled": false
+        },
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "effectKey": "{e7598993}",
+          "resourceHash": "{fa04c09f}",
+          "resourceName": "PetChibiLux_Skin2_Emote_dance_ground",
+          "bones": [
+            "C_Buffbone_Glb_Center_Loc"
+          ],
+          "isLoop": false,
+          "isKillEvent": false,
+          "enabled": true
+        },
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "effectKey": "{137602b4}",
+          "resourceHash": "{4d4c4db0}",
+          "resourceName": "PetChibiLux_Skin2_Emote_dance_trail",
+          "bones": [
+            "Weapon"
+          ],
+          "isLoop": false,
+          "isKillEvent": false,
+          "enabled": true
+        }
+      ],
+      "sounds": [
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "name": "Play_sfx_pet_littlelegend_dance_loop3d",
+          "isLoop": false
+        }
+      ]
+    },
+    "Laugh": {
+      "sourceAnimation": "petchibilux_starguardian_laugh.anm",
+      "graphClipHash": "{2508df61}",
+      "loop": false,
+      "visibility": [
+        {
+          "startFrame": 6.0,
+          "endFrame": 69.0,
+          "show": [
+            "Surprise_Eyes",
+            "Surprise"
+          ],
+          "hide": [
+            "Face_Basic",
+            "Face_Basic_Eyes"
+          ]
+        },
+        {
+          "startFrame": 9.0,
+          "endFrame": 73.0,
+          "show": [
+            "Pet"
+          ],
+          "hide": []
+        }
+      ],
+      "effects": [
+        {
+          "startFrame": 15.0,
+          "endFrame": null,
+          "effectKey": "{1d4ed384}",
+          "resourceHash": "{a65b457d}",
+          "resourceName": "PetChibiLux_Skin2_Emote_Laugh",
+          "bones": [
+            "C_Buffbone_Glb_Center_Loc"
+          ],
+          "isLoop": true,
+          "isKillEvent": false,
+          "enabled": true
+        },
+        {
+          "startFrame": 53.0,
+          "endFrame": null,
+          "effectKey": "{1d4ed384}",
+          "resourceHash": "{a65b457d}",
+          "resourceName": "PetChibiLux_Skin2_Emote_Laugh",
+          "bones": [
+            "C_Buffbone_Glb_Center_Loc"
+          ],
+          "isLoop": true,
+          "isKillEvent": false,
+          "enabled": true
+        },
+        {
+          "startFrame": 15.0,
+          "endFrame": null,
+          "effectKey": "{eabb48b5}",
+          "resourceHash": "{5a69083a}",
+          "resourceName": null,
+          "bones": [
+            "C_Buffbone_Glb_Layout_Loc"
+          ],
+          "isLoop": true,
+          "isKillEvent": false,
+          "enabled": true
+        },
+        {
+          "startFrame": 53.0,
+          "endFrame": null,
+          "effectKey": "{eabb48b5}",
+          "resourceHash": "{5a69083a}",
+          "resourceName": null,
+          "bones": [
+            "C_Buffbone_Glb_Layout_Loc"
+          ],
+          "isLoop": true,
+          "isKillEvent": false,
+          "enabled": true
+        }
+      ],
+      "sounds": [
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "name": "Play_sfx_Pet_littlelegend_laugh01var3d",
+          "isLoop": false
+        }
+      ]
+    },
+    "LaughWacky": {
+      "sourceAnimation": "petchibilux_starguardian_laugh.anm",
+      "graphClipHash": "{2208daa8}",
+      "loop": false,
+      "visibility": [
+        {
+          "startFrame": 6.0,
+          "endFrame": 69.0,
+          "show": [
+            "Wacky"
+          ],
+          "hide": [
+            "Face_Basic",
+            "Face_Basic_Eyes"
+          ]
+        },
+        {
+          "startFrame": 9.0,
+          "endFrame": 73.0,
+          "show": [
+            "Pet"
+          ],
+          "hide": []
+        }
+      ],
+      "effects": [
+        {
+          "startFrame": 15.0,
+          "endFrame": null,
+          "effectKey": "{1d4ed384}",
+          "resourceHash": "{a65b457d}",
+          "resourceName": "PetChibiLux_Skin2_Emote_Laugh",
+          "bones": [
+            "C_Buffbone_Glb_Center_Loc"
+          ],
+          "isLoop": true,
+          "isKillEvent": false,
+          "enabled": true
+        },
+        {
+          "startFrame": 53.0,
+          "endFrame": null,
+          "effectKey": "{1d4ed384}",
+          "resourceHash": "{a65b457d}",
+          "resourceName": "PetChibiLux_Skin2_Emote_Laugh",
+          "bones": [
+            "C_Buffbone_Glb_Center_Loc"
+          ],
+          "isLoop": true,
+          "isKillEvent": false,
+          "enabled": true
+        },
+        {
+          "startFrame": 15.0,
+          "endFrame": null,
+          "effectKey": "{eabb48b5}",
+          "resourceHash": "{5a69083a}",
+          "resourceName": null,
+          "bones": [
+            "C_Buffbone_Glb_Layout_Loc"
+          ],
+          "isLoop": true,
+          "isKillEvent": false,
+          "enabled": true
+        },
+        {
+          "startFrame": 53.0,
+          "endFrame": null,
+          "effectKey": "{eabb48b5}",
+          "resourceHash": "{5a69083a}",
+          "resourceName": null,
+          "bones": [
+            "C_Buffbone_Glb_Layout_Loc"
+          ],
+          "isLoop": true,
+          "isKillEvent": false,
+          "enabled": true
+        }
+      ],
+      "sounds": [
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "name": "Play_sfx_Pet_littlelegend_laugh02var3d",
+          "isLoop": false
+        }
+      ]
+    },
+    "TauntIntro": {
+      "sourceAnimation": "petchibilux_starguardian_taunt.anm",
+      "graphClipHash": "{6725b466}",
+      "loop": false,
+      "visibility": [
+        {
+          "startFrame": 10.0,
+          "endFrame": null,
+          "show": [
+            "Face_Rainbow"
+          ],
+          "hide": [
+            "Face_Basic",
+            "Face_Basic_Eyes"
+          ]
+        }
+      ],
+      "effects": [
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "effectKey": "{b7a216ce}",
+          "resourceHash": "{5998f10b}",
+          "resourceName": "PetChibiLux_Skin2_idle_Trail1",
+          "bones": [
+            "L_Staff"
+          ],
+          "isLoop": false,
+          "isKillEvent": false,
+          "enabled": true
+        },
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "effectKey": "{b7a216ce}",
+          "resourceHash": "{5998f10b}",
+          "resourceName": "PetChibiLux_Skin2_idle_Trail1",
+          "bones": [
+            "R_Staff"
+          ],
+          "isLoop": false,
+          "isKillEvent": false,
+          "enabled": true
+        }
+      ],
+      "sounds": [
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "name": "Play_sfx_Pet_littlelegend_taunt_in3d",
+          "isLoop": false
+        }
+      ]
+    },
+    "TauntLoop": {
+      "sourceAnimation": "petchibilux_starguardian_taunt_cycle.anm",
+      "graphClipHash": "{60842cca}",
+      "loop": true,
+      "visibility": [
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "show": [
+            "Face_Rainbow"
+          ],
+          "hide": [
+            "Face_Basic",
+            "Face_Basic_Eyes"
+          ]
+        }
+      ],
+      "effects": [
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "effectKey": "{8b5e7a29}",
+          "resourceHash": "{463fee20}",
+          "resourceName": "PetChibiLux_Skin2_Emote_Taunt",
+          "bones": [
+            "M_Mouth"
+          ],
+          "isLoop": false,
+          "isKillEvent": false,
+          "enabled": true
+        },
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "effectKey": "{8aec9973}",
+          "resourceHash": "{e3a65cc2}",
+          "resourceName": "PetChibiLux_Skin2_Emote_Taunt_Hit",
+          "bones": [
+            "C_Buffbone_Glb_Layout_Loc"
+          ],
+          "isLoop": false,
+          "isKillEvent": false,
+          "enabled": true
+        }
+      ],
+      "sounds": [
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "name": "Play_sfx_Pet_littlelegend_taunt_loop3d",
+          "isLoop": false
+        }
+      ]
+    },
+    "Joke": {
+      "sourceAnimation": "petchibilux_starguardian_joke.anm",
+      "graphClipHash": "{c21e3446}",
+      "loop": false,
+      "visibility": [
+        {
+          "startFrame": 23.0,
+          "endFrame": 57.0,
+          "show": [
+            "Anger"
+          ],
+          "hide": [
+            "Face_Basic",
+            "Face_Basic_Eyes"
+          ]
+        },
+        {
+          "startFrame": 57.0,
+          "endFrame": 96.0,
+          "show": [
+            "Sneeze"
+          ],
+          "hide": [
+            "Anger",
+            "Face_Basic",
+            "Face_Basic_Eyes"
+          ]
+        }
+      ],
+      "effects": [
+        {
+          "startFrame": 140.0,
+          "endFrame": null,
+          "effectKey": "{b7a216ce}",
+          "resourceHash": "{5998f10b}",
+          "resourceName": "PetChibiLux_Skin2_idle_Trail1",
+          "bones": [
+            "L_Staff"
+          ],
+          "isLoop": false,
+          "isKillEvent": false,
+          "enabled": true
+        },
+        {
+          "startFrame": 140.0,
+          "endFrame": null,
+          "effectKey": "{b7a216ce}",
+          "resourceHash": "{5998f10b}",
+          "resourceName": "PetChibiLux_Skin2_idle_Trail1",
+          "bones": [
+            "R_Staff"
+          ],
+          "isLoop": false,
+          "isKillEvent": false,
+          "enabled": true
+        },
+        {
+          "startFrame": 10.0,
+          "endFrame": null,
+          "effectKey": "{af5188e8}",
+          "resourceHash": "{3270b9ab}",
+          "resourceName": "PetChibiLux_Skin2_Emote_Joke",
+          "bones": [
+            "Weapon"
+          ],
+          "isLoop": true,
+          "isKillEvent": false,
+          "enabled": true
+        },
+        {
+          "startFrame": 84.0,
+          "endFrame": 140.0,
+          "effectKey": "{effd87ba}",
+          "resourceHash": "{4f59dac1}",
+          "resourceName": "PetChibiLux_Skin2_Emote_Joke_Hit",
+          "bones": [
+            "C_Buffbone_Glb_Layout_Loc"
+          ],
+          "isLoop": true,
+          "isKillEvent": false,
+          "enabled": true
+        },
+        {
+          "startFrame": 82.0,
+          "endFrame": 140.0,
+          "effectKey": "{b9bbac20}",
+          "resourceHash": "{07ec7637}",
+          "resourceName": "PetChibiLux_Skin2_Emote_Joke_Mis",
+          "bones": [
+            "Buffbone_Glb_Ground_Loc"
+          ],
+          "isLoop": true,
+          "isKillEvent": false,
+          "enabled": true
+        },
+        {
+          "startFrame": 10.0,
+          "endFrame": null,
+          "effectKey": "{eccea8a1}",
+          "resourceHash": "{252db634}",
+          "resourceName": "PetChibiLux_Skin2_Emote_Joke_Fr",
+          "bones": [
+            "Weapon"
+          ],
+          "isLoop": true,
+          "isKillEvent": false,
+          "enabled": true
+        },
+        {
+          "startFrame": 10.0,
+          "endFrame": 140.0,
+          "effectKey": "{4792ce2b}",
+          "resourceHash": "{bda34dba}",
+          "resourceName": "PetChibiLux_Skin2_Emote_Joke_GroundGlow",
+          "bones": [
+            "C_Buffbone_Glb_Layout_Loc"
+          ],
+          "isLoop": true,
+          "isKillEvent": false,
+          "enabled": true
+        }
+      ],
+      "sounds": [
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "name": "Play_sfx_pet_littlelegend_joke3d",
+          "isLoop": false
+        }
+      ]
+    },
+    "Cast": {
+      "sourceAnimation": "petchibilux_starguardian_cast.anm",
+      "graphClipHash": "{fb65e91b}",
+      "loop": false,
+      "visibility": [
+        {
+          "startFrame": 0,
+          "endFrame": 25.0,
+          "show": [
+            "Anger"
+          ],
+          "hide": [
+            "Face_Basic",
+            "Face_Basic_Eyes"
+          ]
+        }
+      ],
+      "effects": [
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "effectKey": "{b7a216ce}",
+          "resourceHash": "{5998f10b}",
+          "resourceName": "PetChibiLux_Skin2_idle_Trail1",
+          "bones": [
+            "L_Staff"
+          ],
+          "isLoop": false,
+          "isKillEvent": false,
+          "enabled": true
+        },
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "effectKey": "{b7a216ce}",
+          "resourceHash": "{5998f10b}",
+          "resourceName": "PetChibiLux_Skin2_idle_Trail1",
+          "bones": [
+            "R_Staff"
+          ],
+          "isLoop": false,
+          "isKillEvent": false,
+          "enabled": true
+        }
+      ],
+      "sounds": [
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "name": "Play_sfx_Pet_littlelegend_cast3d",
+          "isLoop": false
+        }
+      ]
+    },
+    "CastLoop": {
+      "sourceAnimation": "petchibilux_starguardian_castcycle.anm",
+      "graphClipHash": "{d6c76ccb}",
+      "loop": true,
+      "visibility": [
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "show": [
+            "Anger"
+          ],
+          "hide": [
+            "Face_Basic",
+            "Face_Basic_Eyes"
+          ]
+        }
+      ],
+      "effects": [
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "effectKey": "{b7a216ce}",
+          "resourceHash": "{5998f10b}",
+          "resourceName": "PetChibiLux_Skin2_idle_Trail1",
+          "bones": [
+            "L_Staff"
+          ],
+          "isLoop": false,
+          "isKillEvent": false,
+          "enabled": true
+        },
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "effectKey": "{b7a216ce}",
+          "resourceHash": "{5998f10b}",
+          "resourceName": "PetChibiLux_Skin2_idle_Trail1",
+          "bones": [
+            "R_Staff"
+          ],
+          "isLoop": false,
+          "isKillEvent": false,
+          "enabled": true
+        }
+      ],
+      "sounds": []
+    },
+    "ClassroomIntro": {
+      "sourceAnimation": "petchibilux_starguardian_sg_classroom_intro.anm",
+      "graphClipHash": "{dbfd790e}",
+      "loop": true,
+      "visibility": [
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "show": [
+            "Happy"
+          ],
+          "hide": [
+            "Face_Basic",
+            "Face_Basic_Eyes"
+          ]
+        },
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "show": [
+            "Pet"
+          ],
+          "hide": []
+        }
+      ],
+      "effects": [
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "effectKey": "{3ca9bd99}",
+          "resourceHash": "{00000000}",
+          "resourceName": null,
+          "bones": [
+            "Buffbone_Glb_Ground_Loc"
+          ],
+          "isLoop": false,
+          "isKillEvent": false,
+          "enabled": false
+        },
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "effectKey": "{b44c7707}",
+          "resourceHash": "{00000000}",
+          "resourceName": null,
+          "bones": [
+            "L_Staff"
+          ],
+          "isLoop": false,
+          "isKillEvent": false,
+          "enabled": false
+        },
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "effectKey": "{137602b4}",
+          "resourceHash": "{4d4c4db0}",
+          "resourceName": "PetChibiLux_Skin2_Emote_dance_trail",
+          "bones": [
+            "Weapon"
+          ],
+          "isLoop": false,
+          "isKillEvent": false,
+          "enabled": true
+        }
+      ],
+      "sounds": [
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "name": "Play_sfx_pet_littlelegend_dance_loop3d",
+          "isLoop": false
+        }
+      ]
+    },
+    "DiveIn": {
+      "sourceAnimation": "petchibilux_starguardian_dive_in.anm",
+      "graphClipHash": "{771423f7}",
+      "loop": false,
+      "visibility": [],
+      "effects": [
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "effectKey": "{c8ba868b}",
+          "resourceHash": "{0954dd98}",
+          "resourceName": "PetChibiLux_Skin2_idle_Trail",
+          "bones": [
+            "R_Staff"
+          ],
+          "isLoop": false,
+          "isKillEvent": false,
+          "enabled": true
+        },
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "effectKey": "{c8ba868b}",
+          "resourceHash": "{0954dd98}",
+          "resourceName": "PetChibiLux_Skin2_idle_Trail",
+          "bones": [
+            "L_Staff"
+          ],
+          "isLoop": false,
+          "isKillEvent": false,
+          "enabled": true
+        }
+      ],
+      "sounds": [
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "name": "Play_sfx_pet_littlelegend_dive_in3d",
+          "isLoop": false
+        }
+      ]
+    },
+    "DiveOut": {
+      "sourceAnimation": "petchibilux_starguardian_dive_out.anm",
+      "graphClipHash": "{7f6e217c}",
+      "loop": false,
+      "visibility": [],
+      "effects": [
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "effectKey": "{c8ba868b}",
+          "resourceHash": "{0954dd98}",
+          "resourceName": "PetChibiLux_Skin2_idle_Trail",
+          "bones": [
+            "L_Staff"
+          ],
+          "isLoop": false,
+          "isKillEvent": false,
+          "enabled": true
+        },
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "effectKey": "{c8ba868b}",
+          "resourceHash": "{0954dd98}",
+          "resourceName": "PetChibiLux_Skin2_idle_Trail",
+          "bones": [
+            "R_Staff"
+          ],
+          "isLoop": false,
+          "isKillEvent": false,
+          "enabled": true
+        }
+      ],
+      "sounds": [
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "name": "Play_sfx_pet_littlelegend_dive_out3d",
+          "isLoop": false
+        }
+      ]
+    },
+    "Hurt": {
+      "sourceAnimation": "petchibilux_starguardian_damage_hurt.anm",
+      "graphClipHash": "{3eef6730}",
+      "loop": false,
+      "visibility": [],
+      "effects": [],
+      "sounds": [
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "name": "Play_sfx_pet_littlelegend_damage_hurt3d",
+          "isLoop": false
+        }
+      ]
+    },
+    "Death": {
+      "sourceAnimation": "petchibilux_starguardian_death.anm",
+      "graphClipHash": "{bd28bd4d}",
+      "loop": false,
+      "visibility": [],
+      "effects": [],
+      "sounds": [
+        {
+          "startFrame": 0,
+          "endFrame": null,
+          "name": "Play_sfx_pet_littlelegend_death3d",
+          "isLoop": false
+        }
+      ]
+    }
+  },
+  "limitations": [
+    "Particle and audio events are preserved as source metadata; the GLB contains skeletal motion, skinned geometry, and diffuse/alpha textures. Native particle simulation and emote sounds need separate runtime implementation.",
+    "There is no separate native walk, run-start, or turning clip in this animation graph. Both movement speeds reference Run. IdleIn is used by native transitions into idle.",
+    "Finishers depend on a separate cinematic sequence and large scenery; they are not part of the desktop emote set."
+  ]
+}

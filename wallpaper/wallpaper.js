@@ -2,6 +2,9 @@
   "use strict";
   var schedule = window.WallpaperSchedule;
   var config = window.WALLPAPER_CONFIG || {};
+  var isStudy = window.innerHeight > window.innerWidth;
+  if (isStudy) config = Object.assign({}, config, {daySources:["media/study/day.mp4"], nightSources:["media/study/night.mp4"], volume:0, luxEnabled:false});
+  document.documentElement.dataset.scene = isStudy ? "study" : "classroom";
   var settings = schedule.normalize(config);
   var phases = ["day", "night"];
   var videos = { day: document.getElementById("day"), night: document.getElementById("night") };
@@ -22,11 +25,13 @@
   var status = document.getElementById("media-status");
   var sceneLayout = null;
   var lux = null;
-  var luxSettings = { enabled: config.luxEnabled !== false, size: Number(config.luxSize) || 100, speed: Number(config.luxSpeed) || 100 };
+  var classroom = null;
+  var luxSettings = { enabled: config.luxEnabled !== false, size: Number(config.luxSize) || 100, speed: Number(config.luxSpeed) || 100, interactions: config.luxInteractions !== false };
 
   function syncEffects() {
     if (sceneLayout) { sceneLayout.setPaused(paused()); sceneLayout.setMix(mix); }
     if (lux) lux.setPaused(paused());
+    if (classroom) { classroom.setPaused(paused()); classroom.setMix(mix); }
   }
 
   phases.forEach(function (phase) {
@@ -59,6 +64,7 @@
     videos.day.style.opacity = "1";
     videos.night.style.opacity = String(mix);
     if (sceneLayout) sceneLayout.setMix(mix);
+    if (classroom) classroom.setMix(mix);
     var gains = schedule.audioGains(mix, settings.volume);
     phases.forEach(function (phase) {
       videos[phase].volume = separateAudio ? 0 : gains[phase];
@@ -217,8 +223,9 @@
   }
 
   function setProperty(name, value) {
-    if (name === "luxEnabled" || name === "luxSize" || name === "luxSpeed") {
-      if (name === "luxEnabled") luxSettings.enabled = value === true || value === "true" || value === 1;
+    if (name === "luxEnabled" || name === "luxSize" || name === "luxSpeed" || name === "luxInteractions") {
+      if (name === "luxInteractions") luxSettings.interactions = value === true || value === "true" || value === 1;
+      else if (name === "luxEnabled") luxSettings.enabled = value === true || value === "true" || value === 1;
       else if (name === "luxSize") luxSettings.size = Math.max(65, Math.min(160, Number(value) || 100));
       else luxSettings.speed = Math.max(50, Math.min(150, Number(value) || 100));
       if (lux) lux.configure(luxSettings);
@@ -303,12 +310,30 @@
     });
   }
 
+  var emoteDock = document.getElementById("lux-emotes");
+  var emoteToggle = document.getElementById("emote-toggle");
+  var emoteMenu = document.getElementById("emote-menu");
+  emoteDock.hidden = isStudy;
+  emoteMenu.hidden = true;
+  emoteToggle.addEventListener("click", function () {
+    emoteMenu.hidden = !emoteMenu.hidden;
+    emoteToggle.setAttribute("aria-expanded", String(!emoteMenu.hidden));
+  });
+  emoteMenu.addEventListener("click", function (event) {
+    var button = event.target.closest("button[data-emote]");
+    if (button && lux) lux.command(button.dataset.emote);
+  });
+  window.addEventListener("resize", function () {
+    if ((window.innerHeight > window.innerWidth) !== isStudy) window.location.reload();
+  });
+
   // Read-only diagnostics for local smoke tests and the preview console.
   window.wallpaperState = function () {
     return { active: active, pending: pending, nightMix: mix, paused: paused(), browserMuted: browserMuted, settings: Object.assign({}, settings) };
   };
-  if (window.ArenaLayout) sceneLayout = window.ArenaLayout.create({day: videos.day, night: videos.night, canvas: document.getElementById("ambient"), getState: function () { return {nightMix: mix, paused: paused()}; }});
-  if (window.ChibiLux && sceneLayout) lux = window.ChibiLux.create({element: document.getElementById("lux-layer"), layout: sceneLayout, getState: function () { return {nightMix: mix, paused: paused()}; }, enabled: luxSettings.enabled, size: luxSettings.size, speed: luxSettings.speed});
+  if (window.ArenaLayout) sceneLayout = window.ArenaLayout.create({day: videos.day, night: videos.night, canvas: document.getElementById("ambient"), sceneMode: isStudy ? "study" : "classroom", getState: function () { return {nightMix: mix, paused: paused()}; }});
+  if (window.ClassroomScene && !isStudy) classroom = window.ClassroomScene.create({element:document.getElementById("classroom-desks"), enabled:config.classroomDesks !== false, getState:function(){return {nightMix:mix,paused:paused()};}});
+  if (window.ChibiLux && sceneLayout && !isStudy) lux = window.ChibiLux.create({element: document.getElementById("lux-layer"), layout: sceneLayout, getState: function () { return {nightMix: mix, paused: paused()}; }, enabled: luxSettings.enabled, size: luxSettings.size, speed: luxSettings.speed, interactions: luxSettings.interactions});
   render();
   syncEffects();
   updatePreview();
