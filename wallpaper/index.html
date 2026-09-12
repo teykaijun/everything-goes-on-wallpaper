@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Everything Goes On · TFT Arena</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main id="arena" aria-label="Everything Goes On arena wallpaper">
+    <video id="day" loop playsinline preload="none" disablepictureinpicture aria-hidden="true"></video>
+    <video id="night" loop playsinline preload="none" disablepictureinpicture aria-hidden="true"></video>
+    <audio id="day-audio" loop preload="none"></audio>
+    <audio id="night-audio" loop preload="none"></audio>
+  </main>
+  <aside id="preview-panel" hidden aria-label="Wallpaper preview settings">
+    <p class="eyebrow">TEAMFIGHT TACTICS / ARENA</p>
+    <h1>Everything<br>Goes On</h1>
+    <p class="subtitle">A little daylight. A sky full of stars.</p>
+    <div class="status-line"><span id="phase-dot"></span><span id="phase-label">Loading arena</span><time id="clock"></time></div>
+    <label for="mode">Theme</label>
+    <select id="mode"><option value="automatic">Follow local time</option><option value="day">Day</option><option value="night">Night</option></select>
+    <div class="schedule-inputs">
+      <div><label for="day-start">Day begins</label><input id="day-start" type="time" value="07:00"></div>
+      <div><label for="night-start">Night begins</label><input id="night-start" type="time" value="19:00"></div>
+    </div>
+    <label for="volume">Soundtrack <output id="volume-value">35%</output></label>
+    <input id="volume" type="range" min="0" max="100" value="35">
+    <label for="transition">Transition <output id="transition-value">8s</output></label>
+    <input id="transition" type="range" min="0" max="60" value="8">
+    <button id="enable-audio" type="button" hidden>Enable soundtrack</button>
+    <p id="media-status" role="status"></p>
+    <p class="footnote">Preview controls are hidden on your desktop.<br>Use Lively's Customize menu to save your settings.</p>
+  </aside>
+  <script src="config.js"></script>
+  <script src="schedule.js"></script>
+  <script src="wallpaper.js"></script>
+</body>
+</html>

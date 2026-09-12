@@ -1,0 +1,14 @@
+/* Local media only. Keep these paths relative so the exported Lively ZIP is portable. */
+window.WALLPAPER_CONFIG = {
+  daySources: ["media/day.webm", "media/day.mp4"],
+  nightSources: ["media/night.webm", "media/night.mp4"],
+  // "embedded" uses each video's soundtrack. "separate" uses the OGG files below.
+  audioMode: "separate",
+  dayAudio: "media/day.ogg",
+  nightAudio: "media/night.ogg",
+  mode: "automatic",
+  dayStartHour: 7,
+  nightStartHour: 19,
+  transitionSeconds: 8,
+  volume: 35
+};

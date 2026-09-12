@@ -1,0 +1,14 @@
+{
+  "AppVersion": "2.0.6.1",
+  "Title": "Everything Goes On — Day & Night",
+  "Thumbnail": "thumbnail.jpg",
+  "Preview": null,
+  "Desc": "The Everything Goes On TFT arena with its soundtrack and local-time day/night transitions. 2560 × 1440. Customize the schedule, sound level and fade duration in Lively.",
+  "Author": "WallpaperDesign",
+  "License": "Arena imagery and music belong to their respective rights holders.",
+  "Contact": "",
+  "Type": 1,
+  "FileName": "index.html",
+  "Arguments": "--pause-event true",
+  "IsAbsolutePath": false
+}

@@ -1,0 +1,13 @@
+.tools/
+.sources/
+build/
+dist/
+node_modules/
+__pycache__/
+*.pyc
+# Media is packaged locally. Keep third-party game assets out of the code repository.
+wallpaper/media/*
+!wallpaper/media/README.md
+wallpaper/thumbnail.jpg
+wallpaper/preview.jpg
+

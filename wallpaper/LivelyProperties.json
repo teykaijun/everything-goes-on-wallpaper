@@ -1,0 +1,44 @@
+{
+  "mode": {
+    "type": "dropdown",
+    "value": 0,
+    "text": "Theme",
+    "items": ["Automatic (local time)", "Day", "Night"]
+  },
+  "dayStartHour": {
+    "type": "slider",
+    "value": 7,
+    "min": 0,
+    "max": 23.75,
+    "step": 0.25,
+    "text": "Day begins (24-hour clock; 7.5 = 07:30)"
+  },
+  "nightStartHour": {
+    "type": "slider",
+    "value": 19,
+    "min": 0,
+    "max": 23.75,
+    "step": 0.25,
+    "text": "Night begins (24-hour clock; 19.5 = 19:30)"
+  },
+  "volume": {
+    "type": "slider",
+    "value": 35,
+    "min": 0,
+    "max": 100,
+    "step": 1,
+    "text": "Soundtrack volume (%)"
+  },
+  "transitionSeconds": {
+    "type": "slider",
+    "value": 8,
+    "min": 0,
+    "max": 60,
+    "step": 1,
+    "text": "Day/night crossfade (seconds)"
+  },
+  "scheduleNote": {
+    "type": "label",
+    "value": "Uses the Windows local clock. Equal start times mean day all day. Lively's global audio controls also apply."
+  }
+}
