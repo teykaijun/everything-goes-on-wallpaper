@@ -20,6 +20,14 @@
   var playAttempts = new WeakMap();
   var lastCheck = Date.now();
   var status = document.getElementById("media-status");
+  var sceneLayout = null;
+  var lux = null;
+  var luxSettings = { enabled: config.luxEnabled !== false, size: Number(config.luxSize) || 100, speed: Number(config.luxSpeed) || 100 };
+
+  function syncEffects() {
+    if (sceneLayout) { sceneLayout.setPaused(paused()); sceneLayout.setMix(mix); }
+    if (lux) lux.setPaused(paused());
+  }
 
   phases.forEach(function (phase) {
     var video = videos[phase];
@@ -50,6 +58,7 @@
     // An opaque day layer under a fading night layer avoids a dip to black at midfade.
     videos.day.style.opacity = "1";
     videos.night.style.opacity = String(mix);
+    if (sceneLayout) sceneLayout.setMix(mix);
     var gains = schedule.audioGains(mix, settings.volume);
     phases.forEach(function (phase) {
       videos[phase].volume = separateAudio ? 0 : gains[phase];
@@ -208,6 +217,14 @@
   }
 
   function setProperty(name, value) {
+    if (name === "luxEnabled" || name === "luxSize" || name === "luxSpeed") {
+      if (name === "luxEnabled") luxSettings.enabled = value === true || value === "true" || value === 1;
+      else if (name === "luxSize") luxSettings.size = Math.max(65, Math.min(160, Number(value) || 100));
+      else luxSettings.speed = Math.max(50, Math.min(150, Number(value) || 100));
+      if (lux) lux.configure(luxSettings);
+      if (preview) { document.getElementById("lux-enabled").checked = luxSettings.enabled; document.getElementById("lux-size").value = luxSettings.size; }
+      return;
+    }
     if (!Object.prototype.hasOwnProperty.call(settings, name)) return;
     if (name === "mode" && !["automatic", "day", "night"].includes(value)) {
       value = ["automatic", "day", "night"][Number(value)] || "automatic";
@@ -224,6 +241,7 @@
       var payload = typeof data === "string" ? JSON.parse(data) : data;
       if (!payload || typeof payload.IsPaused !== "boolean") return;
       livelyPaused = payload.IsPaused;
+      syncEffects();
       if (livelyPaused) {
         cancelFade();
         phases.forEach(pausePhase);
@@ -233,15 +251,17 @@
 
   document.addEventListener("visibilitychange", function () {
     hidden = document.hidden;
+    syncEffects();
     if (hidden) {
       cancelFade();
       phases.forEach(pausePhase);
     } else reconcile(true);
   });
-  window.addEventListener("pageshow", function () { pageHidden = false; reconcile(true); });
+  window.addEventListener("pageshow", function () { pageHidden = false; syncEffects(); reconcile(true); });
   window.addEventListener("focus", function () { reconcile(false); });
   window.addEventListener("pagehide", function () {
     pageHidden = true;
+    syncEffects();
     cancelFade();
     phases.forEach(pausePhase);
   });
@@ -252,12 +272,15 @@
     var now = Date.now();
     var resumed = now - lastCheck > 15000 || now < lastCheck;
     lastCheck = now;
+    syncEffects();
     reconcile(resumed);
     updatePreview();
   }, 1000);
 
   if (preview) {
     document.getElementById("preview-panel").hidden = false;
+    document.getElementById("lux-enabled").addEventListener("change", function (event) { setProperty("luxEnabled", event.target.checked); });
+    document.getElementById("lux-size").addEventListener("input", function (event) { setProperty("luxSize", event.target.value); });
     document.getElementById("mode").addEventListener("change", function (event) { setProperty("mode", event.target.value); });
     [["day-start", "dayStartHour"], ["night-start", "nightStartHour"]].forEach(function (entry) {
       document.getElementById(entry[0]).addEventListener("change", function (event) {
@@ -284,7 +307,10 @@
   window.wallpaperState = function () {
     return { active: active, pending: pending, nightMix: mix, paused: paused(), browserMuted: browserMuted, settings: Object.assign({}, settings) };
   };
+  if (window.ArenaLayout) sceneLayout = window.ArenaLayout.create({day: videos.day, night: videos.night, canvas: document.getElementById("ambient"), getState: function () { return {nightMix: mix, paused: paused()}; }});
+  if (window.ChibiLux && sceneLayout) lux = window.ChibiLux.create({element: document.getElementById("lux-layer"), layout: sceneLayout, getState: function () { return {nightMix: mix, paused: paused()}; }, enabled: luxSettings.enabled, size: luxSettings.size, speed: luxSettings.speed});
   render();
+  syncEffects();
   updatePreview();
   reconcile(true);
 })();

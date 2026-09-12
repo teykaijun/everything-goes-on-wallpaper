@@ -3,7 +3,11 @@
     "type": "dropdown",
     "value": 0,
     "text": "Theme",
-    "items": ["Automatic (local time)", "Day", "Night"]
+    "items": [
+      "Automatic (local time)",
+      "Day",
+      "Night"
+    ]
   },
   "dayStartHour": {
     "type": "slider",
@@ -40,5 +44,26 @@
   "scheduleNote": {
     "type": "label",
     "value": "Uses the Windows local clock. Equal start times mean day all day. Lively's global audio controls also apply."
+  },
+  "luxEnabled": {
+    "type": "checkbox",
+    "value": true,
+    "text": "Chibi Star Guardian Lux"
+  },
+  "luxSize": {
+    "type": "slider",
+    "value": 100,
+    "min": 65,
+    "max": 160,
+    "step": 5,
+    "text": "Lux size (%)"
+  },
+  "luxSpeed": {
+    "type": "slider",
+    "value": 100,
+    "min": 50,
+    "max": 150,
+    "step": 5,
+    "text": "Lux walking speed (%)"
   }
 }

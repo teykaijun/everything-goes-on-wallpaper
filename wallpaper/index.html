@@ -9,8 +9,12 @@
 </head>
 <body>
   <main id="arena" aria-label="Everything Goes On arena wallpaper">
-    <video id="day" loop playsinline preload="none" disablepictureinpicture aria-hidden="true"></video>
-    <video id="night" loop playsinline preload="none" disablepictureinpicture aria-hidden="true"></video>
+    <canvas id="ambient" aria-hidden="true"></canvas>
+    <div id="arena-scene">
+      <video id="day" loop playsinline preload="none" disablepictureinpicture aria-hidden="true"></video>
+      <video id="night" loop playsinline preload="none" disablepictureinpicture aria-hidden="true"></video>
+    </div>
+    <div id="lux-layer" aria-hidden="true"></div>
     <audio id="day-audio" loop preload="none"></audio>
     <audio id="night-audio" loop preload="none"></audio>
   </main>
@@ -29,12 +33,18 @@
     <input id="volume" type="range" min="0" max="100" value="35">
     <label for="transition">Transition <output id="transition-value">8s</output></label>
     <input id="transition" type="range" min="0" max="60" value="8">
+    <label class="lux-toggle"><input id="lux-enabled" type="checkbox" checked> Chibi Star Guardian Lux</label>
+    <label for="lux-size">Lux size</label><input id="lux-size" type="range" min="65" max="160" value="100">
     <button id="enable-audio" type="button" hidden>Enable soundtrack</button>
     <p id="media-status" role="status"></p>
     <p class="footnote">Preview controls are hidden on your desktop.<br>Use Lively's Customize menu to save your settings.</p>
   </aside>
   <script src="config.js"></script>
   <script src="schedule.js"></script>
+  <script src="layout.js"></script>
+  <script src="lux-motion.js"></script>
+  <script src="media/lux/model.js"></script>
+  <script src="lux.js"></script>
   <script src="wallpaper.js"></script>
 </body>
 </html>

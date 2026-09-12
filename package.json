@@ -1,0 +1,16 @@
+{
+  "name": "everything-goes-on-wallpaper",
+  "version": "1.1.0",
+  "private": true,
+  "description": "Responsive TFT Lively wallpaper with an animated Chibi Star Guardian Lux",
+  "scripts": {
+    "build:lux": "esbuild src/lux.mjs --bundle --minify --format=iife --target=chrome110 --outfile=wallpaper/lux.js",
+    "test": "node --test wallpaper/tests/*.test.js"
+  },
+  "dependencies": {
+    "three": "0.186.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  }
+}

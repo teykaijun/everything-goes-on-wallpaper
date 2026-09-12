@@ -7,6 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 WALLPAPER = ROOT / "wallpaper"
 FILES = [
     "index.html", "style.css", "config.js", "schedule.js", "wallpaper.js",
+    "layout.js", "lux.js", "lux-motion.js", "media/lux/model.js", "vendor/THREE-LICENSE.txt",
     "LivelyInfo.json", "LivelyProperties.json", "thumbnail.jpg",
     "media/day.webm", "media/night.webm", "media/day.ogg", "media/night.ogg"
 ]
@@ -18,7 +19,7 @@ def main():
         raise SystemExit("Build the media first. Missing: " + ", ".join(missing))
     info = json.loads((WALLPAPER / "LivelyInfo.json").read_text(encoding="utf-8"))
     assert info["Type"] == 1 and info["FileName"] == "index.html" and not info["IsAbsolutePath"]
-    output = ROOT / "dist" / "Everything-Goes-On-2K-Lively.zip"
+    output = ROOT / "dist" / "Everything-Goes-On-Dual-Monitor-Lux-Lively.zip"
     output.parent.mkdir(exist_ok=True)
     with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         for name in FILES:
