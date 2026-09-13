@@ -8,8 +8,10 @@ furnished, animated Star Guardian window view for the portrait display.
 
 ## Use the wallpaper
 
-Download `Everything-Goes-On-Natural-Classroom-Lively.zip` from the
-[v2.3.0 release](https://github.com/teykaijun/everything-goes-on-wallpaper/releases/tag/v2.3.0).
+The current code is version **2.3.0**. The finished Lively package is saved
+locally as `dist/Everything-Goes-On-Natural-Classroom-Lively.zip`. It is not
+attached to a public release because it bundles extracted game media. Use the
+build instructions below to assemble the package from your local assets.
 Separate day and night portrait MP4s remain available in the
 [v2.2.0 release](https://github.com/teykaijun/everything-goes-on-wallpaper/releases/tag/v2.2.0).
 
