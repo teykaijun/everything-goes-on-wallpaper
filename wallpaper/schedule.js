@@ -19,7 +19,7 @@
       dayStartHour: bounded(options.dayStartHour, 7, 0, 23.99),
       nightStartHour: bounded(options.nightStartHour, 19, 0, 23.99),
       transitionSeconds: bounded(options.transitionSeconds, 8, 0, 60),
-      volume: bounded(options.volume, 35, 0, 100)
+      volume: bounded(options.volume, 21, 0, 100)
     };
   }
 

@@ -27,7 +27,7 @@
   },
   "volume": {
     "type": "slider",
-    "value": 35,
+    "value": 21,
     "min": 0,
     "max": 100,
     "step": 1,

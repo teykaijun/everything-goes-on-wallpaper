@@ -2,7 +2,7 @@
 
 This personal fan wallpaper combines the **Everything Goes On** arena and
 **Chibi Star Guardian Lux** from Teamfight Tactics with original furniture and
-generated portrait artwork. The current release is **v2.2.0 — Star Window**.
+generated portrait artwork. The current release is **v2.3.0 — Natural Classroom**.
 It is not an official Riot Games product.
 
 ## Arena footage and design references
@@ -10,18 +10,28 @@ It is not an official Riot Games product.
 - Riot Games, Teamfight Tactics: [Everything Goes On Arena reveal](https://www.youtube.com/watch?v=CZ2_xdR4ts4), embedded in Riot's [Monsters Attack! Pass and More](https://teamfighttactics.leagueoflegends.com/en-us/news/game-updates/monsters-attack-pass-and-more/) announcement.
 - Production credits: [Kudos Productions — TFT Set 8 Arena Everything Goes On](https://kudos3d.artstation.com/projects/vDQvGY), and its [production showcase](https://www.youtube.com/watch?v=m0WojXky24A).
 - User-supplied classroom composition reference: [YouTube Short](https://www.youtube.com/shorts/XF4bOEyCRtc), especially **00:13**, showing desktop icons arranged on classroom tables.
+- User-supplied classroom screenshot, September 13, 2026: the direct reference for the near-side chairs, painted wood, personal belongings, and sunlight in v2.3.
 - Official character showcase reference: [Chibi Star Guardian Lux showcase](https://www.youtube.com/watch?v=A4iaVbYZbDg).
 
 Arena loops use reveal sections at 00:06–00:15 (classroom/day) and 00:19–00:28
 (starry alternate dimension/night), with a one-second tail-to-head dissolve.
 The 1920×1080, 30 fps source is scaled to 2560×1440 with Lanczos.
 
-Version 2.1 added 24 distinct vector desks in a four-by-six daytime classroom,
-with individual bags and accessories. Furniture and props are authored in
-`wallpaper/classroom.js`; they are original adaptations inspired by the reference,
-not extracted Riot furniture meshes. The added desks and chairs fade out at
-night, along with their navigation obstacles and desk-visit targets. The original
-side chairs in Riot's arena footage remain visible.
+Version 2.1 added 24 distinct vector desks in a four-by-six daytime classroom.
+Version 2.3 replaces that art with a **1254×1254 RGBA, 4×3 atlas of 12 painted
+variants** at `wallpaper/media/classroom-v3/desks.png`. The built-in `image_gen`
+tool created the illustrations and then performed a transparency extraction
+pass. Chairs sit on the near/viewer side of the tabletops, with varied belongings.
+These are generated adaptations of the supplied screenshot, not extracted Riot
+furniture meshes or a one-to-one recreation of the game assets.
+
+The twelve images repeat across 24 places. `wallpaper/classroom-geometry.js`
+provides natural offsets, perspective scaling, rotations, and navigation data.
+`wallpaper/classroom.js` displays the atlas with SVG containers, filters, warm
+window-side shading, and long projected shadows. The added desks and chairs fade
+out at night, along with their collision obstacles and desk-visit targets. The
+original side chairs in Riot's arena footage remain visible.
+[Exact classroom prompts and saved paths](CLASSROOM-ART-PROMPTS.md).
 
 Actual Windows icons use 40 grouped positions on the arena's bench bands:
 18 upper and 22 lower, outside the battlefield. These positions are separate
@@ -55,10 +65,10 @@ The live package supplies separate music and clock-based theme switching.
 [Window artwork prompts](WINDOW-ART-PROMPTS.md).
 
 The v1.0 landscape MP4 exports remain unchanged. Earlier v2.0 magical-study and
-v2.1 plain-window masters are retained locally as historical sources. The v2.2
-Star Window package uses the furnished window loops; its main arena, 24 daytime
-desks, 40 bench icon positions, cleanup patch, and native Lux remain unchanged
-from v2.1.
+v2.1 plain-window masters are retained locally as historical sources. Version 2.3
+retains v2.2's furnished portrait loops, the 40 bench icon positions, arena
+cleanup patch, and native Lux companion while replacing the daytime furniture
+artwork and placement.
 
 ## Native Chibi Star Guardian Lux
 
@@ -120,7 +130,9 @@ Selected files are `647683973.wem` for day (128.40764 seconds) and
 matched against the production showcase by waveform correlation (0.9561 day,
 0.9213 night). Original relative loudness is preserved; full music phrases loop
 independently of the visuals. The dual-monitor setup uses one audible stream:
-main display 35%, secondary display 0%, subject to Lively's global sound setting.
+main display 21%, secondary display 0%. The main value is a 40% relative
+reduction from 35%; Lively's existing global sound setting remains 75%. The
+source audio files themselves are unchanged.
 
 Extraction references:
 

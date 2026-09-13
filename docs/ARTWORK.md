@@ -1,6 +1,14 @@
 # Artwork and scene composition
 
-## Version 2.2 — furnished Star Guardian window (current)
+## Version 2.3 — natural daytime classroom (current)
+
+The daytime furniture now follows the user's September 13 classroom screenshot more closely: chairs sit on the near, viewer-facing side of the wooden tabletops. A transparent **1254×1254 RGBA atlas**, `wallpaper/media/classroom-v3/desks.png`, contains **12 painted variants in a 4×3 grid**, with different books, papers, bottles, and bags. The built-in `image_gen` tool produced the illustrations, followed by a second pass to extract them onto transparency. [Exact classroom prompts and saved paths](CLASSROOM-ART-PROMPTS.md).
+
+The twelve illustrations repeat across **24 placements in four rows of six**. `wallpaper/classroom-geometry.js` adds small individual offsets, perspective scaling, and restrained rotations. `wallpaper/classroom.js` renders the atlas cells inside SVG containers with warm window-side shading and long projected floor shadows. Furniture remains still while the surrounding arena footage moves; it disappears at night with its collision footprints and desk-visit targets.
+
+This is generated fan artwork adapted to the reference's orientation, materials, and lighting. It is not a one-to-one game asset reconstruction. The 40 bench icon positions, native Lux companion, arena cleanup, and v2.2 portrait window remain in place. Music now defaults to 21% on the main display and 0% on the secondary display, a 40% relative reduction from the previous main volume of 35%.
+
+## Version 2.2 — furnished Star Guardian window (current portrait)
 
 The current portrait scene adds personal belongings to the arena-style window while retaining the aligned rectangular frame, curtains, sill, and room geometry. Both 941×1672 masters were created with the built-in `image_gen` tool. They are generated fan illustrations, not extracted game assets. [Exact prompts and saved paths](WINDOW-ART-PROMPTS.md).
 
@@ -26,7 +34,7 @@ python scripts/build_window_media.py both
 
 The builder uses `scripts/window_effects.py` for the transparent effect layers. `--preview-times 0,6,12,18` saves representative frames; `--output-dir PATH` selects a separate output folder. Lively provides the local-clock theme switch, 8-second crossfade, and separate music. The standalone MP4s are silent fixed-theme videos.
 
-The landscape arena, 24 daytime desks, 40 bench icon positions, and native Lux companion are unchanged from v2.1. The earlier window, study, and cleanup masters below remain available locally; current builds do not overwrite them.
+Version 2.2 retained the v2.1 landscape scene while adding this furnished portrait view. Version 2.3 replaces the daytime desk artwork and placements as described above. The earlier window, study, and cleanup masters below remain available locally; current builds do not overwrite them.
 
 ## Version 2.1 retained window sources and daytime seats
 
@@ -41,11 +49,11 @@ Version 2.1 used a close view of the arena's ordinary rectangular school windows
 
 The MP4s are upscaled exports with periodic illumination and drifting dust/starlight. The window frames remain still. Lively supplies automatic clock switching and the 8-second transition; an MP4 by itself does not read the Windows clock.
 
-The daytime classroom has 24 individually styled desk-and-seat combinations: differently placed books, papers, pencil cases, bottles and bags. These repo-native SVG details were inspired by the belongings visible in the user's [reference at 0:13](https://www.youtube.com/watch?v=XF4bOEyCRtc&t=13s). They are an adaptation rather than a seat-for-seat model extraction. Added furniture disappears at night. Desktop icons now occupy compact upper/lower bench bands outside the battlefield and are independent of the furniture.
+Version 2.1's daytime classroom had 24 individually styled desk-and-seat combinations: differently placed books, papers, pencil cases, bottles and bags. These repo-native SVG details were inspired by the belongings visible in the user's [reference at 0:13](https://www.youtube.com/watch?v=XF4bOEyCRtc&t=13s). They are an adaptation rather than a seat-for-seat model extraction. Added furniture disappears at night. Desktop icons now occupy compact upper/lower bench bands outside the battlefield and are independent of the furniture.
 
 ## Version 2.0 retained sources
 
-The earlier study masters and original cleanup plates below are retained locally. They are not the active portrait design in v2.2.
+The earlier study masters and original cleanup plates below are retained locally. They are not the active portrait design in the current release.
 
 Version 2.0 combines original arena footage, a small generated cleanup patch,
 original vector classroom furniture, and an independent generated portrait study.
@@ -122,7 +130,7 @@ The composition follows the user's
 especially **00:13**, where shortcuts sit on classroom tables. The implementation
 provided 40 desk slots to accommodate the workstation inventory and exported
 obstacle and aisle data for Lux. Since v2.1, icons use the separate bench bands
-and the daytime classroom uses 24 individually styled desks.
+and the daytime classroom uses 24 placements. Version 2.3 replaces the vector desk artwork with twelve painted atlas variants.
 
 Actual Windows icons are positioned separately with the documented Shell helper.
 The artwork does not contain screenshots, copies, or baked-in pictures of those

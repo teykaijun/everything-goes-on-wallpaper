@@ -70,7 +70,7 @@ test('native face and Pet events reset completely between emotes',()=>{
 test('the actual twenty-four-desk classroom has collision-free routes to desks and both poros',()=>{
   const classroom=require('../classroom.js').computeLayout(2560,1440);
   const options={polygon:classroom.polygon,obstacles:classroom.obstacles,waypoints:classroom.waypoints,padding:12};
-  const env=motion.environment(options),from={x:1280,y:850};
+  const env=motion.environment(options),from=classroom.waypoints.find(p=>p.id==='aisle-3-3');
   assert.equal(classroom.obstacles.length,24);
   const targets=classroom.waypoints.filter(p=>p.kind==='poro'||(p.kind==='desk'&&(p.col===0||p.col===5)));
   for(const target of targets){

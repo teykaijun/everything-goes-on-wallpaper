@@ -10,7 +10,7 @@ window.WALLPAPER_CONFIG = {
   dayStartHour: 7,
   nightStartHour: 19,
   transitionSeconds: 8,
-  volume: 35,
+  volume: 21,
   luxEnabled: true,
   luxSize: 100,
   luxSpeed: 100,

@@ -1,6 +1,6 @@
-# Everything Goes On — Star Window
+# Everything Goes On — Natural Classroom
 
-Version **2.2.0** is a Lively Wallpaper setup for a horizontal main monitor and a
+Version **2.3.0** is a Lively Wallpaper setup for a horizontal main monitor and a
 vertical secondary monitor. It combines TFT's **Everything Goes On** arena and
 instrumental soundtrack with a daytime classroom, desktop icons on the arena's
 bench bands, an interactive native 3D **Chibi Star Guardian Lux**, and a separate
@@ -8,20 +8,28 @@ furnished, animated Star Guardian window view for the portrait display.
 
 ## Use the wallpaper
 
-Download `Everything-Goes-On-Star-Window-Lively.zip` from the
+Download `Everything-Goes-On-Natural-Classroom-Lively.zip` from the
+[v2.3.0 release](https://github.com/teykaijun/everything-goes-on-wallpaper/releases/tag/v2.3.0).
+Separate day and night portrait MP4s remain available in the
 [v2.2.0 release](https://github.com/teykaijun/everything-goes-on-wallpaper/releases/tag/v2.2.0).
-The release also provides separate day and night portrait MP4s.
 
 1. Install [Lively Wallpaper](https://www.rocksdanister.com/lively/) and import the ZIP.
 2. Choose independent wallpapers per display, then apply this project to both monitors.
-3. In **Customize**, use soundtrack volume **35% on the main monitor** and **0% on the secondary monitor**.
+3. In **Customize**, use soundtrack volume **21% on the main monitor** and **0% on the secondary monitor**.
 4. Keep Lively's wallpaper input set to **Mouse**. Keyboard input is not required.
 
-The **2560×1440 landscape view** shows the arena and **24 distinct desks in four
-rows of six**, with individual bags and classroom accessories. The added desks
-and chairs fade out at night; their collision obstacles and desk-visit targets
-are removed too. The arena's original side chairs remain in the source footage.
-Lux walks through the open night arena and navigates around the daytime furniture.
+The **2560×1440 landscape view** shows the arena and **24 desks in four rows of
+six**. Painted wooden desks have chairs on the near, viewer-facing side, matching
+the orientation in the supplied classroom screenshot. Twelve illustrated
+variants provide different books, papers, bottles, and bags; they repeat across
+24 places with small offsets, perspective scaling, and restrained rotations.
+Warm window-side shading and long projected shadows help them sit naturally on
+the floor. This is a visual adaptation of the reference, not extracted furniture.
+
+The added desks and chairs fade out at night; their collision obstacles and
+desk-visit targets are removed too. The arena's original side chairs remain in
+the source footage. Lux walks through the open night arena and navigates around
+the daytime furniture.
 
 The **1080×1920 portrait display** receives its own furnished window composition,
 with the same rectangular frame, cream curtains, and room geometry across themes.
@@ -33,12 +41,12 @@ At night, a cyan-purple plant, star lantern, open spellbook, and pink star cryst
 light the sill. The bag moves to the left floor and violet light reflects from
 the shoes. Four-point glints, orbiting gold stars, cyan-pink trails, and local prop
 glows animate the scene. These effects are encoded into the MP4; the illustrated
-props and window structure remain still within each theme. The main arena,
-24 daytime desks, bench icon positions, and Lux are unchanged from v2.1.
+props and window structure remain still within each theme. This portrait scene
+is unchanged from v2.2; the bench icon positions and native Lux are also retained.
 
 Defaults are **day 07:00–19:00**, night outside those hours, an **8-second
-crossfade**, and **35% main-display soundtrack volume**. Both displays use the
-Windows local clock. Keep their schedules matched; Lively saves customization
+crossfade**, and **21% main-display soundtrack volume**, a 40% relative reduction
+from the previous 35%. Both displays use the Windows local clock. Keep their schedules matched; Lively saves customization
 per display. The live Lux companion and classroom furniture belong to the
 landscape view.
 
@@ -113,12 +121,14 @@ dust, glints, stars, and trails are encoded motion; the furnishings are part of
 the fixed illustrations. The standalone window MP4s are silent, fixed-theme loops. The Lively ZIP
 provides clock-based switching and separate full-length OGG music playback.
 [Artwork process and masters](docs/ARTWORK.md) ·
-[Window artwork prompts](docs/WINDOW-ART-PROMPTS.md).
+[Window artwork prompts](docs/WINDOW-ART-PROMPTS.md) ·
+[Classroom artwork prompts](docs/CLASSROOM-ART-PROMPTS.md).
 
 The [v1.0 landscape MP4 exports](https://github.com/teykaijun/everything-goes-on-wallpaper/releases/tag/v1.0.0)
 remain unchanged. The earlier v2.0 magical-study and v2.1 plain-window masters
-are retained locally as historical sources. Version 2.2 uses the furnished
-window masters in `wallpaper/media/window-magic/`. Original game loops and
+are retained locally as historical sources. The current release retains v2.2's
+furnished window masters in `wallpaper/media/window-magic/` and adds the painted
+furniture atlas in `wallpaper/media/classroom-v3/desks.png`. Original game loops and
 earlier artwork masters are retained when rebuilding the current media.
 
 ## Build locally
@@ -175,6 +185,12 @@ endpoint and preserves the original duration before writing the GLB and
 Supply the cleanup PNGs and the two window masters listed in
 [ARTWORK.md](docs/ARTWORK.md). The current window masters are
 `wallpaper/media/window-magic/day.png` and `wallpaper/media/window-magic/night.png`.
+Also restore `wallpaper/media/classroom-v3/desks.png`, the 1254×1254 transparent
+4×3 atlas used by the daytime furniture renderer. `wallpaper/classroom.js` draws
+its twelve cells with SVG clipping, lighting, and projected shadows;
+`wallpaper/classroom-geometry.js` supplies the 24 placements and navigation data.
+The [classroom prompts](docs/CLASSROOM-ART-PROMPTS.md) document the built-in
+image generation and transparency pass; regenerating them produces new pixels.
 
 ```powershell
 python scripts/build_v2_media.py --only arena
@@ -201,7 +217,7 @@ dotnet build scripts/desktop-layout/DesktopLayout.csproj --configuration Release
 .\scripts\desktop-layout\Test-ReadOnly.ps1
 ```
 
-The Lively output is `dist/Everything-Goes-On-Star-Window-Lively.zip`.
+The Lively output is `dist/Everything-Goes-On-Natural-Classroom-Lively.zip`.
 Desktop helper checks perform inventory and dry-runs and verify that icon
 positions remain unchanged. Game files are read without modifying the
 installation. Game media, generated masters, local backups, and build packages

@@ -79,7 +79,7 @@ test("night startup never plays the day video or displays a day-first fade", asy
   assert.equal(env.window.wallpaperState().active, "night");
   assert.equal(env.elements.day.paused, true);
   assert.equal(env.elements.night.paused, false);
-  assert.equal(env.elements.night.volume, .35);
+  assert.equal(env.elements.night.volume, .21);
 });
 
 test("a transition crossfades sound and pauses the hidden decoder at completion", async () => {
@@ -96,7 +96,7 @@ test("a transition crossfades sound and pauses the hidden decoder at completion"
   assert.equal(env.window.wallpaperState().active, "night");
   assert.equal(env.elements.day.paused, true);
   assert.equal(env.elements.day.volume, 0);
-  assert.equal(env.elements.night.volume, .35);
+  assert.equal(env.elements.night.volume, .21);
 });
 
 test("Lively pause stops all media and resume immediately selects the current clock phase", async () => {

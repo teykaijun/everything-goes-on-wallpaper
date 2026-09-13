@@ -17,20 +17,31 @@ function fakeDom(state={nightMix:0,paused:true}) {
  return {instance,host,state,events,element:arena.children[0]};
 }
 
-test('daytime furniture has 24 distinct student desks in four perspective rows',()=>{
+test('daytime furniture has 24 distinct desks arranged naturally within the battlefield',()=>{
  const scene=classroom.computeLayout(2560,1440);
  assert.equal(scene.desks.length,24);assert.equal(scene.obstacles.length,24);
  assert.equal(new Set(scene.desks.map(d=>d.profile.id)).size,24);
  assert.equal(new Set(scene.desks.map(d=>JSON.stringify(d.profile))).size,24);
  scene.desks.forEach((desk,i)=>{
   assert.equal(desk.row,Math.floor(i/6));assert.equal(desk.col,i%6);
-  assert.equal(desk.footY,400+170*desk.row);assert.equal(desk.width,164+8*desk.row);
   assert.equal(desk.zIndex,Math.round(desk.footY)+10);
   assert.ok(desk.profile.bagColor&&desk.profile.bookColor&&desk.profile.belongings);
+  assert.ok(Number.isFinite(desk.rotation)&&Math.abs(desk.rotation)<=3);
+  assert.ok(desk.artBounds.left>=645&&desk.artBounds.right<=1925,'furniture clears the poros and right wall');
+  assert.ok(desk.artBounds.top>=300&&desk.artBounds.bottom<=940,'furniture stays between the bench icon bands');
  });
- assert.equal(scene.desks[0].centerX,730);assert.equal(scene.desks[23].centerX,1830);
- assert.equal(scene.desks[18].centerX,700);
- for(const desk of scene.desks)assert.ok(desk.centerX+desk.width/2<=1924);
+ const rows=[0,1,2,3].map(row=>scene.desks.filter(d=>d.row===row));
+ for(const row of rows){
+  assert.ok(new Set(row.map(d=>d.footY)).size>=4,'chairs are not locked to an artificial horizontal baseline');
+  assert.ok(new Set(row.map(d=>d.width)).size>=3,'desk sizes vary slightly within a perspective row');
+  assert.ok(row.some(d=>d.rotation<0)&&row.some(d=>d.rotation>0),'desks have restrained independent angles');
+  assert.ok(row[0].light>row[5].light,'window-side furniture receives warmer light');
+ }
+ for(let row=1;row<rows.length;row++){
+  const mean=desks=>desks.reduce((sum,d)=>sum+d.width,0)/desks.length;
+  assert.ok(mean(rows[row])>mean(rows[row-1]),'foreground furniture is larger');
+  assert.ok(Math.min(...rows[row].map(d=>d.footY))>Math.max(...rows[row-1].map(d=>d.footY)));
+ }
  assert.ok(scene.desks.some(d=>d.profile.bagShape==='round'));
  assert.equal(scene.desks.filter(d=>d.profile.belongings.includes('frog')).length,1);
 });
@@ -129,10 +140,10 @@ test('all 40 icon anchors belong to the independent benches and stay fixed at ni
 });
 
 
-test('the tightened classroom keeps every standing target reachable for a larger Lux',()=>{
+test('the natural classroom keeps every standing target reachable for a larger Lux',()=>{
  const motion=require('../lux-motion.js'),scene=classroom.computeLayout(2560,1440);
  const options={polygon:scene.polygon,obstacles:scene.obstacles,waypoints:scene.waypoints,padding:20};
- const environment=motion.environment(options),from={x:1280,y:850};
+ const environment=motion.environment(options),from=scene.waypoints.find(p=>p.id==='aisle-3-3');
  for(const target of scene.waypoints){
   const path=motion.findPath(from,target,options);
   assert.ok(path,'reachable route to '+target.id);
