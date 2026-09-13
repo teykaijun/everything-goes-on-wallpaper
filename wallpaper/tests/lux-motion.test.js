@@ -67,12 +67,12 @@ test('native face and Pet events reset completely between emotes',()=>{
   const idle=motion.visibilityFor(metadata,'Idle',0);
   assert.equal(idle.has('Pet'),false);assert.equal(idle.has('Surprise'),false);assert.ok(idle.has('Face_Basic_Eyes'));
 });
-test('the actual twenty-four-desk classroom has collision-free routes to desks and both poros',()=>{
+test('the actual twenty-desk classroom has collision-free routes to desks and both poros',()=>{
   const classroom=require('../classroom.js').computeLayout(2560,1440);
   const options={polygon:classroom.polygon,obstacles:classroom.obstacles,waypoints:classroom.waypoints,padding:12};
   const env=motion.environment(options),from=classroom.waypoints.find(p=>p.id==='aisle-3-3');
-  assert.equal(classroom.obstacles.length,24);
-  const targets=classroom.waypoints.filter(p=>p.kind==='poro'||(p.kind==='desk'&&(p.col===0||p.col===5)));
+  assert.equal(classroom.obstacles.length,20);
+  const targets=classroom.waypoints.filter(p=>p.kind==='poro'||(p.kind==='desk'&&(p.col===0||p.col===4)));
   for(const target of targets){
     const path=motion.findPath(from,target,options);assert.ok(path,`No route to ${target.id}`);
     for(let i=1;i<path.length;i++)assert.equal(motion.clearSegment(path[i-1],path[i],env),true,`Desk collision en route to ${target.id}`);

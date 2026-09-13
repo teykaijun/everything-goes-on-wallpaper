@@ -5,14 +5,23 @@
   else root.ClassroomGeometry = api;
 })(typeof window !== 'undefined' ? window : globalThis, function () {
   'use strict';
-  var SOURCE_WIDTH = 2560, SOURCE_HEIGHT = 1440, ROWS = 4, COLS = 6;
+  var SOURCE_WIDTH = 2560, SOURCE_HEIGHT = 1440, ROWS = 4, COLS = 5;
   var FLOOR = [{x:.21,y:.19},{x:.80,y:.19},{x:.80,y:965/1440},{x:.21,y:965/1440}];
-  // Small, fixed differences preserve a lived-in classroom while keeping the
-  // walking lanes stable. Perspective widens toward the foreground.
-  var X_OFFSETS = [[-4,3,-5,5,-3,1],[-8,-2,4,1,5,-3],[2,-5,4,-7,3,0],[-3,6,-4,3,-5,-4]];
-  var Y_OFFSETS = [[-3,4,-5,1,-2,5],[3,-5,2,-3,5,-1],[-4,3,-1,5,-3,2],[2,-4,3,-2,4,-5]];
-  var WIDTH_OFFSETS = [[-3,2,0,3,-1,-2],[2,-2,3,-1,1,-3],[-2,3,-1,2,-3,1],[1,-3,2,-2,3,-1]];
-  var ROTATIONS = [[-1.5,.7,-.6,1.1,-.9,1.6],[1.3,-1.7,.8,-.5,1.6,-1.1],[-.8,1.5,-1.2,.6,-1.8,.9],[1.7,-.9,1.2,-1.5,.7,-1.3]];
+  // The screenshot has different framing from our arena video. Matching 134
+  // static scene landmarks registers these tabletop centers to the 2560x1440
+  // video, preserving its five-column perspective instead of scaling the crop.
+  var TABLETOP_CENTERS = [
+    [[863.2,274.6],[1060.9,274.9],[1258.5,275.2],[1456.0,275.4],[1653.4,275.7]],
+    [[836.2,421.1],[1041.2,426.2],[1255.9,424.0],[1465.6,426.7],[1677.7,426.9]],
+    [[804.2,592.0],[1033.7,592.3],[1258.2,592.5],[1480.1,592.7],[1701.9,592.9]],
+    [[774.7,780.1],[1011.5,782.7],[1255.6,780.5],[1494.6,783.1],[1731.0,783.3]]
+  ];
+  var DESKTOP_WIDTHS = [102.45,109.78,117.07,126.86];
+  var VISIBLE_HEIGHTS = [122.05,134.25,148.93,166.08];
+  var ROTATIONS = [[0,0,0,0,4],[0,0,0,-6,0],[-2,2,0,2,-2],[2,-2,3,0,1]];
+  // Atlas contract: canvas160x166, desktop192/248 of its width, tabletop
+  // center(80,38), chair feet(80,158), and148px of visible furniture height.
+  var DESKTOP_FRACTION = 192/248, ANCHOR_Y = 158, TABLETOP_Y = 38;
 
   function size(value, fallback) { value=Number(value);return Number.isFinite(value)&&value>0?value:fallback; }
   function clamp(value) { return Math.max(0,Math.min(1,Number(value)||0)); }
@@ -33,11 +42,16 @@
     return {x:desk.centerX+x*c-y*s,y:desk.footY+x*s+y*c};
   }
   function nativeDesk(row,col,profiles) {
-    var span=1046+8*row,deskWidth=154+8*row+WIDTH_OFFSETS[row][col];
-    var centerX=1288-span/2+col*span/(COLS-1)+X_OFFSETS[row][col];
-    var footY=460+143*row+Y_OFFSETS[row][col];
-    return {id:'desk-'+(row+1)+'-'+(col+1),row:row,col:col,centerX:centerX,footY:footY,width:deskWidth,rotation:ROTATIONS[row][col],light:1.10-col*.042+(row===1?.012:row===3?-.016:0),tabletopFrontY:footY-86*deskWidth/160,profile:profiles&&profiles[row*COLS+col]};
+    var center=TABLETOP_CENTERS[row][col],deskWidth=DESKTOP_WIDTHS[row]/DESKTOP_FRACTION;
+    var deskHeight=VISIBLE_HEIGHTS[row]*166/148,scaleY=deskHeight/166;
+    var angle=ROTATIONS[row][col]*Math.PI/180;
+    // Rotate around the planted chair feet without moving the measured desk
+    // center. The foreground rows have the taller aspect ratio in the reference.
+    var centerX=center[0]-(ANCHOR_Y-TABLETOP_Y)*scaleY*Math.sin(angle);
+    var footY=center[1]+(ANCHOR_Y-TABLETOP_Y)*scaleY*Math.cos(angle);
+    return {id:'desk-'+(row+1)+'-'+(col+1),row:row,col:col,centerX:centerX,footY:footY,width:deskWidth,height:deskHeight,desktopWidth:DESKTOP_WIDTHS[row],tabletopCenterX:center[0],tabletopCenterY:center[1],rotation:ROTATIONS[row][col],light:1.08-col*.034,tabletopFrontY:footY-(ANCHOR_Y-72)*scaleY,profile:profiles&&profiles[row*COLS+col]};
   }
+
   function computeLayout(width,height,options,profiles,benchLayout) {
     options=options||{};
     var mix=clamp(options.nightMix),desksActive=options.desksActive===undefined?mix<.82:Boolean(options.desksActive);
@@ -46,18 +60,18 @@
     for(var row=0;row<ROWS;row++){
       nativeRows[row]=[];
       for(var col=0;col<COLS;col++){
-        var native=nativeDesk(row,col,profiles),s=native.width/160,foot=project({x:native.centerX,y:native.footY},view),artScale=s*view.scale;
-        var floorPoints=[[-native.width*.50,-35],[native.width*.50,-35],[native.width*.50,12],[-native.width*.50,12]].map(function(p){return aroundDesk(p[0],p[1],native);});
+        var native=nativeDesk(row,col,profiles),sx=native.width/160,sy=native.height/166,foot=project({x:native.centerX,y:native.footY},view),artScale=sx*view.scale;
+        var floorPoints=[[-native.width*.43,-48*sy],[native.width*.43,-48*sy],[native.width*.43,0],[-native.width*.43,0]].map(function(p){return aroundDesk(p[0],p[1],native);});
         var nativeObstacle=bounds(floorPoints);
         var obstacle=bounds(floorPoints.map(function(p){return project(p,view);}));
-        var tabletopPoints=[[-native.width*.43,-132*s],[native.width*.43,-132*s],[native.width*.43,-86*s],[-native.width*.43,-86*s]].map(function(p){return project(aroundDesk(p[0],p[1],native),view);});
-        var front=project(aroundDesk(0,-86*s,native),view);
-        var artPoints=[[-80*s,-148*s],[80*s,-148*s],[80*s,18*s],[-80*s,18*s]].map(function(p){return project(aroundDesk(p[0],p[1],native),view);});
-        desks.push({id:native.id,row:row,col:col,centerX:foot.x,footY:foot.y,tabletopFrontY:front.y,width:native.width*view.scale,height:166*artScale,x:foot.x-80*artScale,y:foot.y-148*artScale,artScale:artScale,zIndex:Math.round(foot.y)+10,rotation:native.rotation,light:native.light,profile:native.profile,tabletopRect:bounds(tabletopPoints),artBounds:bounds(artPoints)});
+        var tabletopPoints=[[-62*sx,-148*sy],[62*sx,-148*sy],[62*sx,-86*sy],[-62*sx,-86*sy]].map(function(p){return project(aroundDesk(p[0],p[1],native),view);});
+        var front=project(aroundDesk(0,-86*sy,native),view);
+        var artPoints=[[-80*sx,-158*sy],[80*sx,-158*sy],[80*sx,8*sy],[-80*sx,8*sy]].map(function(p){return project(aroundDesk(p[0],p[1],native),view);});
+        desks.push({id:native.id,row:row,col:col,centerX:foot.x,footY:foot.y,tabletopFrontY:front.y,width:native.width*view.scale,height:native.height*view.scale,x:foot.x-80*artScale,y:foot.y-158*sy*view.scale,artScale:artScale,artScaleY:sy*view.scale,desktopWidth:native.desktopWidth*view.scale,tabletopCenter:project({x:native.tabletopCenterX,y:native.tabletopCenterY},view),zIndex:Math.round(foot.y)+10,rotation:native.rotation,light:native.light,profile:native.profile,tabletopRect:bounds(tabletopPoints),artBounds:bounds(artPoints)});
         obstacles.push({id:native.id,kind:'desk',row:row,col:col,x:obstacle.x,y:obstacle.y,width:obstacle.width,height:obstacle.height,rect:obstacle,footY:foot.y,polygon:[{x:obstacle.left,y:obstacle.top},{x:obstacle.right,y:obstacle.top},{x:obstacle.right,y:obstacle.bottom},{x:obstacle.left,y:obstacle.bottom}]});
         nativeRows[row].push({desk:native,rect:nativeObstacle});
         var approach=project({x:native.centerX,y:nativeObstacle.bottom+25},view);
-        waypoints.push({id:native.id+'-approach',deskId:native.id,row:row,col:col,x:approach.x,y:approach.y,kind:'desk',lookAt:project(aroundDesk(0,-116*s,native),view)});
+        waypoints.push({id:native.id+'-approach',deskId:native.id,row:row,col:col,x:approach.x,y:approach.y,kind:'desk',lookAt:project({x:native.tabletopCenterX,y:native.tabletopCenterY},view)});
       }
     }
     // Every cross aisle follows the actual shifted and rotated floor footprints.
@@ -80,8 +94,7 @@
         waypoints.push({id:'aisle-'+aisleRow+'-'+aisleCol,x:point.x,y:point.y,kind:'aisle'});
       }
     }
-    var firstRowBottom=Math.max.apply(null,nativeRows[0].map(function(d){return d.rect.bottom;}));
-    [{x:660,y:firstRowBottom+24,id:'poro-upper-left',lookAt:{x:636,y:404}},{x:636,y:790,id:'poro-lower-left',lookAt:{x:556,y:716}}].forEach(function(point){
+    [{x:700,y:437,id:'poro-upper-left',lookAt:{x:636,y:404}},{x:636,y:790,id:'poro-lower-left',lookAt:{x:556,y:716}}].forEach(function(point){
       var p=project(point,view),focus=project(point.lookAt,view);
       waypoints.push({id:point.id,x:p.x,y:p.y,kind:'poro',lookAt:focus});
     });

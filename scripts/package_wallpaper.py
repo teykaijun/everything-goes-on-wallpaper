@@ -9,7 +9,7 @@ FILES = [
     "index.html", "style.css", "config.js", "schedule.js", "wallpaper.js",
     "layout.js", "bench-layout.js", "classroom-geometry.js", "classroom.js", "classroom.css", "lux.js", "lux-motion.js", "media/lux/animation-data.js", "media/lux/model.js", "vendor/THREE-LICENSE.txt",
     "LivelyInfo.json", "LivelyProperties.json", "thumbnail.jpg",
-    "media/classroom-v3/desks.png", "media/day-clean.webm", "media/night-clean.webm", "media/window-magic/day.mp4", "media/window-magic/night.mp4", "media/day.ogg", "media/night.ogg"
+    "media/classroom-v4/desks.png", "media/day-clean.webm", "media/night-clean.webm", "media/window-magic/day.mp4", "media/window-magic/night.mp4", "media/day.ogg", "media/night.ogg"
 ]
 
 
@@ -19,7 +19,7 @@ def main():
         raise SystemExit("Build the media first. Missing: " + ", ".join(missing))
     info = json.loads((WALLPAPER / "LivelyInfo.json").read_text(encoding="utf-8"))
     assert info["Type"] == 1 and info["FileName"] == "index.html" and not info["IsAbsolutePath"]
-    output = ROOT / "dist" / "Everything-Goes-On-Natural-Classroom-Lively.zip"
+    output = ROOT / "dist" / "Everything-Goes-On-TFT-Classroom-Lively.zip"
     output.parent.mkdir(exist_ok=True)
     with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         for name in FILES:

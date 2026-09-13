@@ -5,24 +5,11 @@
   else root.ClassroomScene = api;
 })(typeof window !== 'undefined' ? window : globalThis, function (root) {
   'use strict';
-  var SOURCE_WIDTH = 2560, SOURCE_HEIGHT = 1440, ROWS = 4, COLS = 6;
+  var SOURCE_WIDTH = 2560, SOURCE_HEIGHT = 1440, ROWS = 4, COLS = 5;
   var active = null, serial = 0;
   var GEOMETRY = root.ClassroomGeometry || (typeof module === 'object' && module.exports ? require('./classroom-geometry.js') : null);
   var BENCH_LAYOUT = root.BenchLayout || (typeof module === 'object' && module.exports ? require('./bench-layout.js') : null);
-  var PROFILES = [
-    ['#5baba2','#edaaae','satchel','book-papers',-1,-2],['#718ebb','#9585b7','backpack','books-star',1,1],
-    ['#ab82aa','#659d9b','tote','notebook-case',-1,2],['#dd9ca5','#7399be','backpack','book-bottle',1,-1],
-    ['#688eaa','#d5aa69','satchel','papers-pencil',1,2],['#bd97c0','#cb888b','tote','openbook-case',-1,-2],
-    ['#cb9c71','#80a7a2','backpack','books-bottle',1,1],['#77a8a3','#9d8db7','satchel','notebook-papers',-1,-1],
-    ['#d7a5ae','#7d96b9','tote','openbook-pencil',1,2],['#7f9cba','#d1a777','backpack','papers-case',-1,-2],
-    ['#9484ad','#e0b2ac','satchel','book-bottle',-1,1],['#a8b993','#8099b2','tote','books-pencil',1,-1],
-    ['#699caa','#d4b782','backpack','notebook-case',-1,2],['#a886bd','#93b4ab','round','book-papers',1,-2],
-    ['#db9eb4','#9e8db8','satchel','openbook-bottle',1,1],['#7293b6','#d59b97','tote','books-case',-1,-1],
-    ['#ac8b91','#8dafa2','backpack','papers-pencil',1,2],['#8ba5b8','#c3a873','satchel','book-frog',-1,-2],
-    ['#a98cbd','#bc9d73','tote','openbook-papers',1,1],['#69a59c','#d69dac','backpack','books-case',-1,-1],
-    ['#d1a48a','#88a1bb','satchel','notebook-bottle',-1,2],['#8aa8b9','#b795bc','tote','papers-case',1,-2],
-    ['#b58da9','#6ca7a1','backpack','openbook-pencil',-1,1],['#7899ac','#d4b377','round','books-bottle',1,-1]
-  ].map(function(p,index){return {id:'student-'+String(index+1).padStart(2,'0'),bagColor:p[0],bookColor:p[1],bagShape:p[2],belongings:p[3],bagSide:p[4],chairAngle:p[5],woodTint:['#8b5c2e','#f8e1a4','#c59c55','#c2905d'][index%4]};});
+  var PROFILES = [["#c6a27c","#8d68bd","none","book-papers",0,0],["#648bc4","#ed93b0","backpack","star-case",1,0],["#80b4a7","#ede0be","none","openbook-pencil",0,0],["#d7809f","#805ab8","satchel","bottle",1,0],["#68b5af","#a69bc8","none","books-star",1,0],["#8964b2","#6f91c6","backpack","notebook",1,0],["#c3a07d","#edadd0","none","papers-star",0,0],["#ba9a73","#eadfc4","tote","openbook",1,0],["#b683a8","#7fa8ce","none","bottle-case",0,0],["#80b5ab","#e9bf69","none","notebook-star",0,0],["#d585ad","#7956a9","backpack","book",1,0],["#c7a783","#83a2c8","none","papers-case",0,0],["#c27583","#e9dec2","satchel","openbook",1,0],["#72aeb6","#92aabd","none","books-mascot",0,0],["#d38ab3","#b49ad3","none","bottle-notebook",0,0],["#be946b","#e8d9be","satchel","notebook",1,0],["#648dc6","#8b60ae","backpack","book",1,0],["#c09e79","#e99bc0","none","papers-case",0,0],["#77a9a5","#e9dbb9","tote","openbook",1,0],["#d7a4b8","#8966ba","none","bottle-mascot",0,0]].map(function(p,index){return {id:'student-'+String(index+1).padStart(2,'0'),bagColor:p[0],bookColor:p[1],bagShape:p[2],belongings:p[3],bagSide:p[4],chairAngle:p[5]};});
   var DAY = {shadow:'#392627'};
   var NIGHT = {shadow:'#17152d'};
 
@@ -43,16 +30,17 @@
     function parts(hex){return [1,3,5].map(function(i){return parseInt(hex.slice(i,i+2),16);});}
     var a=parts(day),b=parts(night);return 'rgb('+a.map(function(v,i){return Math.round(v+(b[i]-v)*mix);}).join(',')+')';
   }
-  // A cached transparent illustration atlas supplies painted material and chair
-  // detail. Viewports select each sprite without modifying the generated PNG.
-  var SPRITES = [0,1,3,7,9,10, 2,8,5,9,0,11, 3,10,8,2,4,1, 9,0,11,1,8,6];
+  // Twenty individual sprites, selected from the unchanged generated atlas.
+  // Crop metrics and the measured tabletop/foot anchors are shared with geometry.
+  var SPRITES = Array.from({length:20},function(_,index){return index;});
+  var ATLAS_X = [134,380.5,626,871.5,1117], ATLAS_Y = [45,340,639,937];
   function deskSvg(id,row,col) {
-    var sprite=SPRITES[row*COLS+col],tileX=(sprite%4)*313.5,tileY=[72,456,834][Math.floor(sprite/4)];
-    var shadowOpacity=.30-col*.025;
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 166" aria-hidden="true" focusable="false">'+
-      '<defs><filter id="'+id+'-shadow" x="-35%" y="-70%" width="190%" height="230%"><feGaussianBlur stdDeviation="2.7"/></filter><filter id="'+id+'-matte"><feComponentTransfer><feFuncA type="linear" slope="1.035" intercept="-.035"/></feComponentTransfer></filter></defs>'+
-      '<g class="desk-cast-shadow" fill="var(--desk-shadow)" opacity="'+shadowOpacity+'" filter="url(#'+id+'-shadow)"><path d="M31 117L75 142 147 157 131 124 119 98 74 100Z"/><path d="M52 147l40 29 47 3-29-33-21-12-25 2Z"/></g>'+
-      '<svg class="desk-illustration" x="0" y="0" width="160" height="166" viewBox="'+tileX+' '+tileY+' 313.5 386" preserveAspectRatio="none" overflow="hidden"><image href="media/classroom-v3/desks.png" x="0" y="0" width="1254" height="1254" filter="url(#'+id+'-matte)"/></svg></svg>';
+    var tileX=ATLAS_X[col]-124,tileY=ATLAS_Y[row];
+    var shadowOpacity=.25-col*.018;
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 166" preserveAspectRatio="none" aria-hidden="true" focusable="false">'+
+      '<defs><filter id="'+id+'-shadow" x="-35%" y="-70%" width="190%" height="230%"><feGaussianBlur stdDeviation="2.2"/></filter><filter id="'+id+'-matte"><feComponentTransfer><feFuncA type="linear" slope="1.035" intercept="-.035"/></feComponentTransfer></filter></defs>'+
+      '<g class="desk-cast-shadow" fill="var(--desk-shadow)" opacity="'+shadowOpacity+'" filter="url(#'+id+'-shadow)"><ellipse cx="81" cy="156" rx="48" ry="7"/><path d="M31 123L59 147 143 154 129 132 117 117 71 117Z"/><path d="M56 156l19 12 42 2-17-15-15-5-23 1Z"/></g>'+
+      '<svg class="desk-illustration" x="0" y="0" width="160" height="166" style="clip-path:inset(0 0 0 '+(row===3&&col===2?'2%':'0')+')" viewBox="'+tileX+' '+tileY+' 248 259" preserveAspectRatio="none" overflow="hidden"><image href="media/classroom-v4/desks.png" x="0" y="0" width="1254" height="1254" filter="url(#'+id+'-matte)"/></svg></svg>';
   }
   function create(options) {
     options=options||{};

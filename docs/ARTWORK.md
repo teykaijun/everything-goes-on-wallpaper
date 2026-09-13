@@ -1,6 +1,14 @@
 # Artwork and scene composition
 
-## Version 2.3 — natural daytime classroom (current)
+## Version 2.4 - TFT screenshot seating (current landscape)
+
+The latest user-supplied TFT gameplay screenshot defines **20 seats in four rows of five**. Matching arena scenery landmarks registers that screenshot to the existing 2560x1440 scene; the measured tabletop centers, row spacing, widths and perspective determine the current geometry. The first-row desktops are about 102 pixels wide, increasing to about 127 pixels at the front. The chairs sit on the near/viewer side and their planted feet set depth ordering.
+
+The built-in `image_gen` tool created **20 distinct golden-orange desk/chair sprites** with individual books, paper, bags, pencil cases, bottles and small Star Guardian accents. The selected **1254x1254 RGBA 5x4 atlas** is `wallpaper/media/classroom-v4/desks.png`. Two extraction attempts were needed; the selected PNG has real transparency. Viewports select original pixels without rewriting the master. Directional shading and restrained ground shadows blend the furniture into the original animated arena. [Exact prompts](CLASSROOM-ART-PROMPTS.md).
+
+This is generated artwork adapted to the native furniture silhouette, material and reference composition. It is not a pixel-identical screenshot reproduction or an extracted game mesh. The previous furniture atlas remains locally in `media/classroom-v3/`. Night furniture removal, Lux interactions, bench icon placement, portrait window and the reduced 21% main volume remain active.
+
+## Version 2.3 — natural daytime classroom (retained)
 
 The daytime furniture now follows the user's September 13 classroom screenshot more closely: chairs sit on the near, viewer-facing side of the wooden tabletops. A transparent **1254×1254 RGBA atlas**, `wallpaper/media/classroom-v3/desks.png`, contains **12 painted variants in a 4×3 grid**, with different books, papers, bottles, and bags. The built-in `image_gen` tool produced the illustrations, followed by a second pass to extract them onto transparency. [Exact classroom prompts and saved paths](CLASSROOM-ART-PROMPTS.md).
 

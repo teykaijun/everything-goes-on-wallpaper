@@ -1,6 +1,6 @@
-# Everything Goes On — Natural Classroom
+# Everything Goes On — TFT Classroom
 
-Version **2.3.0** is a Lively Wallpaper setup for a horizontal main monitor and a
+Version **2.4.0** is a Lively Wallpaper setup for a horizontal main monitor and a
 vertical secondary monitor. It combines TFT's **Everything Goes On** arena and
 instrumental soundtrack with a daytime classroom, desktop icons on the arena's
 bench bands, an interactive native 3D **Chibi Star Guardian Lux**, and a separate
@@ -8,8 +8,8 @@ furnished, animated Star Guardian window view for the portrait display.
 
 ## Use the wallpaper
 
-The current code is version **2.3.0**. The finished Lively package is saved
-locally as `dist/Everything-Goes-On-Natural-Classroom-Lively.zip`. It is not
+The current code is version **2.4.0**. The finished Lively package is saved
+locally as `dist/Everything-Goes-On-TFT-Classroom-Lively.zip`. It is not
 attached to a public release because it bundles extracted game media. Use the
 build instructions below to assemble the package from your local assets.
 Separate day and night portrait MP4s remain available in the
@@ -20,13 +20,14 @@ Separate day and night portrait MP4s remain available in the
 3. In **Customize**, use soundtrack volume **21% on the main monitor** and **0% on the secondary monitor**.
 4. Keep Lively's wallpaper input set to **Mouse**. Keyboard input is not required.
 
-The **2560×1440 landscape view** shows the arena and **24 desks in four rows of
-six**. Painted wooden desks have chairs on the near, viewer-facing side, matching
-the orientation in the supplied classroom screenshot. Twelve illustrated
-variants provide different books, papers, bottles, and bags; they repeat across
-24 places with small offsets, perspective scaling, and restrained rotations.
-Warm window-side shading and long projected shadows help them sit naturally on
-the floor. This is a visual adaptation of the reference, not extracted furniture.
+The **2560x1440 landscape view** shows the arena with **20 desks in four rows
+of five**, matching the latest TFT gameplay screenshot. The screenshot was
+aligned to shared arena landmarks before measuring tabletop centers, desk
+widths, row spacing and perspective. Smaller golden-orange desks have low orange
+chairs on the viewer side. Twenty distinct illustrated sprites retain individual
+books, bags, pencil cases, bottles and small Star Guardian accessories.
+Window-side shading and floor shadows integrate the furniture with the arena.
+The artwork is a generated adaptation of the native appearance.
 
 The added desks and chairs fade out at night; their collision obstacles and
 desk-visit targets are removed too. The arena's original side chairs remain in
@@ -130,7 +131,7 @@ The [v1.0 landscape MP4 exports](https://github.com/teykaijun/everything-goes-on
 remain unchanged. The earlier v2.0 magical-study and v2.1 plain-window masters
 are retained locally as historical sources. The current release retains v2.2's
 furnished window masters in `wallpaper/media/window-magic/` and adds the painted
-furniture atlas in `wallpaper/media/classroom-v3/desks.png`. Original game loops and
+furniture atlas in `wallpaper/media/classroom-v4/desks.png`. Original game loops and
 earlier artwork masters are retained when rebuilding the current media.
 
 ## Build locally
@@ -187,10 +188,10 @@ endpoint and preserves the original duration before writing the GLB and
 Supply the cleanup PNGs and the two window masters listed in
 [ARTWORK.md](docs/ARTWORK.md). The current window masters are
 `wallpaper/media/window-magic/day.png` and `wallpaper/media/window-magic/night.png`.
-Also restore `wallpaper/media/classroom-v3/desks.png`, the 1254×1254 transparent
-4×3 atlas used by the daytime furniture renderer. `wallpaper/classroom.js` draws
-its twelve cells with SVG clipping, lighting, and projected shadows;
-`wallpaper/classroom-geometry.js` supplies the 24 placements and navigation data.
+Also restore `wallpaper/media/classroom-v4/desks.png`, the 1254x1254 transparent
+5x4 atlas used by the daytime furniture renderer. `wallpaper/classroom.js` draws
+its twenty cells with SVG clipping, lighting and projected shadows;
+`wallpaper/classroom-geometry.js` supplies the measured 20 placements and navigation data.
 The [classroom prompts](docs/CLASSROOM-ART-PROMPTS.md) document the built-in
 image generation and transparency pass; regenerating them produces new pixels.
 
@@ -219,7 +220,7 @@ dotnet build scripts/desktop-layout/DesktopLayout.csproj --configuration Release
 .\scripts\desktop-layout\Test-ReadOnly.ps1
 ```
 
-The Lively output is `dist/Everything-Goes-On-Natural-Classroom-Lively.zip`.
+The Lively output is `dist/Everything-Goes-On-TFT-Classroom-Lively.zip`.
 Desktop helper checks perform inventory and dry-runs and verify that icon
 positions remain unchanged. Game files are read without modifying the
 installation. Game media, generated masters, local backups, and build packages

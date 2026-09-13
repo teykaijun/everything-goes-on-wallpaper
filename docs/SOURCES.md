@@ -2,7 +2,7 @@
 
 This personal fan wallpaper combines the **Everything Goes On** arena and
 **Chibi Star Guardian Lux** from Teamfight Tactics with original furniture and
-generated portrait artwork. The current release is **v2.3.0 — Natural Classroom**.
+generated portrait artwork. The current release is **v2.4.0 - TFT Classroom**.
 It is not an official Riot Games product.
 
 ## Arena footage and design references
@@ -11,26 +11,25 @@ It is not an official Riot Games product.
 - Production credits: [Kudos Productions — TFT Set 8 Arena Everything Goes On](https://kudos3d.artstation.com/projects/vDQvGY), and its [production showcase](https://www.youtube.com/watch?v=m0WojXky24A).
 - User-supplied classroom composition reference: [YouTube Short](https://www.youtube.com/shorts/XF4bOEyCRtc), especially **00:13**, showing desktop icons arranged on classroom tables.
 - User-supplied classroom screenshot, September 13, 2026: the direct reference for the near-side chairs, painted wood, personal belongings, and sunlight in v2.3.
+- Latest user-supplied TFT gameplay screenshot, September 13, 2026: direct reference for v2.4 five-column/four-row seating, measured tabletop placement, small orange desk/chair proportions and game-style material.
 - Official character showcase reference: [Chibi Star Guardian Lux showcase](https://www.youtube.com/watch?v=A4iaVbYZbDg).
 
 Arena loops use reveal sections at 00:06–00:15 (classroom/day) and 00:19–00:28
 (starry alternate dimension/night), with a one-second tail-to-head dissolve.
 The 1920×1080, 30 fps source is scaled to 2560×1440 with Lanczos.
 
-Version 2.1 added 24 distinct vector desks in a four-by-six daytime classroom.
-Version 2.3 replaces that art with a **1254×1254 RGBA, 4×3 atlas of 12 painted
-variants** at `wallpaper/media/classroom-v3/desks.png`. The built-in `image_gen`
-tool created the illustrations and then performed a transparency extraction
-pass. Chairs sit on the near/viewer side of the tabletops, with varied belongings.
-These are generated adaptations of the supplied screenshot, not extracted Riot
-furniture meshes or a one-to-one recreation of the game assets.
+Version 2.4 uses a **1254x1254 RGBA, 5x4 atlas of 20 distinct furniture sprites** at
+`wallpaper/media/classroom-v4/desks.png`. The built-in `image_gen` tool generated
+golden-orange desks with low near-side chairs and individual belongings, then
+extracted them onto real transparency. The renderer adapts the user's latest
+TFT screenshot using aligned arena landmarks for measured placement and scale.
+These are generated adaptations, not extracted Riot furniture meshes or a
+pixel-identical recreation. Earlier v2.3 artwork remains locally archived.
 
-The twelve images repeat across 24 places. `wallpaper/classroom-geometry.js`
-provides natural offsets, perspective scaling, rotations, and navigation data.
-`wallpaper/classroom.js` displays the atlas with SVG containers, filters, warm
-window-side shading, and long projected shadows. The added desks and chairs fade
-out at night, along with their collision obstacles and desk-visit targets. The
-original side chairs in Riot's arena footage remain visible.
+`wallpaper/classroom-geometry.js` supplies 20 placements and 52 navigation targets.
+`wallpaper/classroom.js` uses SVG viewports, directional shading and restrained
+projected floor shadows. Added furniture fades out at night with its collision
+obstacles and desk-visit targets. Original side chairs in the arena footage remain.
 [Exact classroom prompts and saved paths](CLASSROOM-ART-PROMPTS.md).
 
 Actual Windows icons use 40 grouped positions on the arena's bench bands:
@@ -65,7 +64,7 @@ The live package supplies separate music and clock-based theme switching.
 [Window artwork prompts](WINDOW-ART-PROMPTS.md).
 
 The v1.0 landscape MP4 exports remain unchanged. Earlier v2.0 magical-study and
-v2.1 plain-window masters are retained locally as historical sources. Version 2.3
+v2.1 plain-window masters are retained locally as historical sources. Version 2.4
 retains v2.2's furnished portrait loops, the 40 bench icon positions, arena
 cleanup patch, and native Lux companion while replacing the daytime furniture
 artwork and placement.

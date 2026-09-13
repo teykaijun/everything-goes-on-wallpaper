@@ -1,6 +1,6 @@
 /* Desks and Lux share floor-depth ordering inside the arena. */
 .classroom-scene { display:contents; pointer-events:none; --desk-opacity:1; --desk-shadow:#392627; }
 .classroom-scene[hidden], [data-orientation="portrait"] .classroom-scene { display:none!important; }
-.classroom-desk { opacity:var(--desk-opacity,1); position:absolute; pointer-events:none; user-select:none; overflow:visible; transform-origin:50% 89.1566265%; }
+.classroom-desk { opacity:var(--desk-opacity,1); position:absolute; pointer-events:none; user-select:none; overflow:visible; transform-origin:50% 95.1807229%; }
 .classroom-desk > svg { display:block; width:100%; height:100%; overflow:visible; }
-.desk-illustration { filter:brightness(var(--desk-light,1)) saturate(.82); }
+.desk-illustration { filter:brightness(var(--desk-light,1)) saturate(.91); }

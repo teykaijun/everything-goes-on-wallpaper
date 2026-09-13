@@ -17,33 +17,36 @@ function fakeDom(state={nightMix:0,paused:true}) {
  return {instance,host,state,events,element:arena.children[0]};
 }
 
-test('daytime furniture has 24 distinct desks arranged naturally within the battlefield',()=>{
+test('daytime seating matches the TFT screenshot with twenty individual places',()=>{
  const scene=classroom.computeLayout(2560,1440);
- assert.equal(scene.desks.length,24);assert.equal(scene.obstacles.length,24);
- assert.equal(new Set(scene.desks.map(d=>d.profile.id)).size,24);
- assert.equal(new Set(scene.desks.map(d=>JSON.stringify(d.profile))).size,24);
+ assert.equal(scene.desks.length,20);assert.equal(scene.obstacles.length,20);
+ assert.equal(new Set(scene.desks.map(d=>d.profile.id)).size,20);
+ assert.equal(new Set(scene.desks.map(d=>JSON.stringify(d.profile))).size,20);
  scene.desks.forEach((desk,i)=>{
-  assert.equal(desk.row,Math.floor(i/6));assert.equal(desk.col,i%6);
+  assert.equal(desk.row,Math.floor(i/5));assert.equal(desk.col,i%5);
   assert.equal(desk.zIndex,Math.round(desk.footY)+10);
-  assert.ok(desk.profile.bagColor&&desk.profile.bookColor&&desk.profile.belongings);
-  assert.ok(Number.isFinite(desk.rotation)&&Math.abs(desk.rotation)<=3);
-  assert.ok(desk.artBounds.left>=645&&desk.artBounds.right<=1925,'furniture clears the poros and right wall');
-  assert.ok(desk.artBounds.top>=300&&desk.artBounds.bottom<=940,'furniture stays between the bench icon bands');
+  assert.ok(desk.profile.belongings,'each seat retains personal belongings');
+  assert.ok(Number.isFinite(desk.rotation)&&Math.abs(desk.rotation)<=6);
+  assert.ok(desk.artBounds.left>=665&&desk.artBounds.right<=1850,'furniture clears the poros and right wall');
+  assert.ok(desk.artBounds.top>=235&&desk.artBounds.bottom<=945,'furniture stays between the bench icon bands');
  });
  const rows=[0,1,2,3].map(row=>scene.desks.filter(d=>d.row===row));
  for(const row of rows){
-  assert.ok(new Set(row.map(d=>d.footY)).size>=4,'chairs are not locked to an artificial horizontal baseline');
-  assert.ok(new Set(row.map(d=>d.width)).size>=3,'desk sizes vary slightly within a perspective row');
-  assert.ok(row.some(d=>d.rotation<0)&&row.some(d=>d.rotation>0),'desks have restrained independent angles');
-  assert.ok(row[0].light>row[5].light,'window-side furniture receives warmer light');
+  assert.equal(row.length,5);
+  assert.ok(row[0].light>row[4].light,'window-side furniture receives more light');
+  assert.ok(Math.abs(row[2].tabletopCenter.x-1257)<3,'the middle column follows the arena vanishing line');
  }
  for(let row=1;row<rows.length;row++){
-  const mean=desks=>desks.reduce((sum,d)=>sum+d.width,0)/desks.length;
-  assert.ok(mean(rows[row])>mean(rows[row-1]),'foreground furniture is larger');
+  assert.ok(rows[row][2].width>rows[row-1][2].width,'foreground furniture is larger');
+  assert.ok(rows[row][4].tabletopCenter.x-rows[row][0].tabletopCenter.x>rows[row-1][4].tabletopCenter.x-rows[row-1][0].tabletopCenter.x,'the five columns spread toward the viewer');
   assert.ok(Math.min(...rows[row].map(d=>d.footY))>Math.max(...rows[row-1].map(d=>d.footY)));
  }
- assert.ok(scene.desks.some(d=>d.profile.bagShape==='round'));
- assert.equal(scene.desks.filter(d=>d.profile.belongings.includes('frog')).length,1);
+ // Independent scene landmarks register the screenshot's back-left and
+ // front-right seats to these positions; raw image scaling does not.
+ const back=rows[0][0],front=rows[3][4];
+ assert.ok(Math.abs(back.tabletopCenter.x-863)<2&&Math.abs(back.tabletopCenter.y-275)<2);
+ assert.ok(Math.abs(front.tabletopCenter.x-1731)<2&&Math.abs(front.tabletopCenter.y-783)<2);
+ assert.ok(Math.abs(back.desktopWidth-103)<3&&Math.abs(front.desktopWidth-127)<3,'desktop sizes match the registered reference');
 });
 
 test('night removes all added furniture obstacles and desk visits while keeping the arena floor',()=>{
@@ -72,7 +75,7 @@ test('portrait leaves the arena clear of classroom furniture and obstacles',()=>
 test('all navigation targets clear desks with a 20-source-pixel Lux collider',()=>{
  for(const [width,height] of [[1920,1080],[2560,1440],[3840,1440]]){
   const scene=classroom.computeLayout(width,height),padding=20*scene.view.scale;
-  assert.equal(scene.waypoints.length,61);
+  assert.equal(scene.waypoints.length,52);
   for(const point of scene.waypoints)for(const obstacle of scene.obstacles)assert.ok(!pointInside(point,obstacle.rect,padding),point.id+' is clear of '+obstacle.id);
  }
 });
@@ -80,7 +83,7 @@ test('all navigation targets clear desks with a 20-source-pixel Lux collider',()
 test('all route targets stay inside the battlefield above the front bench',()=>{
  const scene=classroom.computeLayout(2560,1440),[a,,b]=scene.polygon;
  for(const point of scene.waypoints)assert.ok(point.x>a.x&&point.x<b.x&&point.y>a.y&&point.y<b.y,point.id);
- assert.equal(scene.waypoints.filter(p=>p.kind==='desk').length,24);
+ assert.equal(scene.waypoints.filter(p=>p.kind==='desk').length,20);
  assert.equal(scene.waypoints.filter(p=>p.kind==='poro').length,2);
  for(const point of scene.waypoints.filter(p=>p.kind==='aisle'))for(const obstacle of scene.obstacles)assert.ok(point.y<obstacle.rect.top||point.y>obstacle.rect.bottom);
  for(const point of scene.waypoints.filter(p=>p.kind==='desk'))assert.equal(classroom.isIconPoint(point.x,point.y,2560,1440),false);
@@ -112,7 +115,7 @@ test('theme topology changes emit once with clear day/night collision data',()=>
  assert.equal(scene.getObstacles().length,0);assert.equal(scene.getWaypoints().filter(p=>p.kind==='desk').length,0);
  assert.equal(dom.events[0].detail.navigationChanged,true);assert.equal(dom.events[0].detail.viewportChanged,false);assert.equal(dom.events[0].detail.desksActive,false);
  scene.setMix(.81);scene.setMix(.75);assert.equal(dom.events.length,1);
- scene.setMix(.74);assert.equal(dom.events.length,2);assert.equal(scene.getObstacles().length,24);assert.equal(dom.events[1].detail.desksActive,true);
+ scene.setMix(.74);assert.equal(dom.events.length,2);assert.equal(scene.getObstacles().length,20);assert.equal(dom.events[1].detail.desksActive,true);
  scene.destroy();
 });
 
@@ -140,7 +143,7 @@ test('all 40 icon anchors belong to the independent benches and stay fixed at ni
 });
 
 
-test('the natural classroom keeps every standing target reachable for a larger Lux',()=>{
+test('the twenty-seat classroom keeps every standing target reachable for a larger Lux',()=>{
  const motion=require('../lux-motion.js'),scene=classroom.computeLayout(2560,1440);
  const options={polygon:scene.polygon,obstacles:scene.obstacles,waypoints:scene.waypoints,padding:20};
  const environment=motion.environment(options),from=scene.waypoints.find(p=>p.id==='aisle-3-3');
