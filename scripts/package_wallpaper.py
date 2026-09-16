@@ -25,6 +25,7 @@ def main():
         for name in FILES:
             archive.write(WALLPAPER / name, name)
         archive.write(ROOT / "docs" / "SOURCES.md", "CREDITS.md")
+        archive.write(ROOT / "docs" / "LIVELY.md", "LIVELY.md")
         archive.write(ROOT / "docs" / "ARTWORK.md", "ARTWORK.md")
         archive.write(ROOT / "docs" / "CLASSROOM-ART-PROMPTS.md", "CLASSROOM-ART-PROMPTS.md")
         archive.write(ROOT / "docs" / "WINDOW-ART-PROMPTS.md", "WINDOW-ART-PROMPTS.md")

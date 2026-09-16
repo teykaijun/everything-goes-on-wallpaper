@@ -1,22 +1,22 @@
 # Media sources and credits
 
-This personal fan wallpaper combines the **Everything Goes On** arena and
+This unofficial fan wallpaper combines the **Everything Goes On** arena and
 **Chibi Star Guardian Lux** from Teamfight Tactics with original furniture and
-generated portrait artwork. The current release is **v3.0.0 - Wallpaper Engine**.
+generated portrait artwork. The current release is **v3.1.0 - Wallpaper Engine and Lively**.
 It is not an official Riot Games product.
 
 ## Arena footage and design references
 
 - Riot Games, Teamfight Tactics: [Everything Goes On Arena reveal](https://www.youtube.com/watch?v=CZ2_xdR4ts4), embedded in Riot's [Monsters Attack! Pass and More](https://teamfighttactics.leagueoflegends.com/en-us/news/game-updates/monsters-attack-pass-and-more/) announcement.
-- Production credits: [Kudos Productions — TFT Set 8 Arena Everything Goes On](https://kudos3d.artstation.com/projects/vDQvGY), and its [production showcase](https://www.youtube.com/watch?v=m0WojXky24A).
+- Production credits: [Kudos Productions â€” TFT Set 8 Arena Everything Goes On](https://kudos3d.artstation.com/projects/vDQvGY), and its [production showcase](https://www.youtube.com/watch?v=m0WojXky24A).
 - User-supplied classroom composition reference: [YouTube Short](https://www.youtube.com/shorts/XF4bOEyCRtc), especially **00:13**, showing desktop icons arranged on classroom tables.
 - User-supplied classroom screenshot, September 13, 2026: the direct reference for the near-side chairs, painted wood, personal belongings, and sunlight in v2.3.
 - Latest user-supplied TFT gameplay screenshot, September 13, 2026: direct reference for v2.4 five-column/four-row seating, measured tabletop placement, small orange desk/chair proportions and game-style material.
 - Official character showcase reference: [Chibi Star Guardian Lux showcase](https://www.youtube.com/watch?v=A4iaVbYZbDg).
 
-Arena loops use reveal sections at 00:06–00:15 (classroom/day) and 00:19–00:28
+Arena loops use reveal sections at 00:06â€“00:15 (classroom/day) and 00:19â€“00:28
 (starry alternate dimension/night), with a one-second tail-to-head dissolve.
-The 1920×1080, 30 fps source is scaled to 2560×1440 with Lanczos.
+The 1920Ã—1080, 30 fps source is scaled to 2560Ã—1440 with Lanczos.
 
 Version 2.4 uses a **1254x1254 RGBA, 5x4 atlas of 20 distinct furniture sprites** at
 `wallpaper/media/classroom-v4/desks.png`. The built-in `image_gen` tool generated
@@ -39,11 +39,11 @@ waypoints stop beside the actual left-wall poros and the daytime desk surfaces.
 
 The small Lux already baked into the arena footage is removed with a generated
 cleanup plate composited only within x=400, y=808, width=208, height=166 in the
-2560×1440 output. The remaining arena composition uses the original footage.
+2560Ã—1440 output. The remaining arena composition uses the original footage.
 
 Version 2.2 replaces the portrait video with furnished window illustrations made
 with the built-in `image_gen` tool. The aligned masters are
-`wallpaper/media/window-magic/day.png` and `night.png`, both **941×1672**.
+`wallpaper/media/window-magic/day.png` and `night.png`, both **941Ã—1672**.
 The day sill holds a pink star planter, mint pencil cup, pastel books, and a
 wing-trimmed pink satchel; white-and-pink trainers sit on the right floor.
 At night, a glowing cyan-purple plant, cyan star lantern, open spellbook, and
@@ -53,14 +53,14 @@ remain aligned across the golden and cosmic palettes.
 
 `scripts/build_window_media.py` uses Pillow, imageio-ffmpeg, and the original
 procedural effects in `scripts/window_effects.py` to encode silent **24-second,
-30 fps, 1440×2560** MP4s. Day effects include visible floating dust and sunshafts;
+30 fps, 1440Ã—2560** MP4s. Day effects include visible floating dust and sunshafts;
 night effects include four-point glints, orbiting gold stars with cyan-pink
 trails, and local prop glows. The structure and props are fixed illustrations;
 lighting and particles are actual encoded motion. These effects are original
 wallpaper code, not extracted Riot particle assets. Output resolution exceeds
-the masters and should not be described as native 1440×2560 source detail.
+the masters and should not be described as native 1440Ã—2560 source detail.
 The live package supplies separate music and clock-based theme switching.
-[Artwork masters and process](ARTWORK.md) ·
+[Artwork masters and process](ARTWORK.md) Â·
 [Window artwork prompts](WINDOW-ART-PROMPTS.md).
 
 The v1.0 landscape MP4 exports remain unchanged. Earlier v2.0 magical-study and
@@ -80,7 +80,7 @@ Geometry, skeleton, textures, and animations originate under
 `assets/characters/petchibilux/themes/starguardian/`. The converted model
 retains native Body, Weapons, Pet, and facial-expression submeshes. Body,
 pet/staff, and expression TEX maps are decoded and embedded in the GLB. The asset
-contains 13 submeshes, 11,306 vertices, and three embedded 512×512 RGBA texture maps.
+contains 13 submeshes, 11,306 vertices, and three embedded 512Ã—512 RGBA texture maps.
 
 The package contains these **17 native skeletal animation clips**:
 
@@ -149,7 +149,7 @@ resize handling, native property/playback events and Lux graphics recovery.
 ## Runtime and desktop integration
 
 The character renderer bundles [Three.js](https://github.com/mrdoob/three.js)
-0.186.0 and its GLTFLoader, under the MIT license, copyright © 2010–2026
+0.186.0 and its GLTFLoader, under the MIT license, copyright Â© 2010â€“2026
 three.js authors. The full license accompanies the package at
 `vendor/THREE-LICENSE.txt`.
 

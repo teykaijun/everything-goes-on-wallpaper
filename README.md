@@ -1,10 +1,32 @@
-# Everything Goes On - Wallpaper Engine
+# Everything Goes On — Wallpaper Engine & Lively
 
-Version **3.0.0** runs the existing Everything Goes On arena and interactive
-Chibi Star Guardian Lux in **Wallpaper Engine**, with a separate furnished
-Star Guardian window for the portrait display. Day/night themes follow local
-time, and the main soundtrack remains at 21%; the portrait display is silent.
-The 20-seat classroom, bench icons and individual belongings are retained.
+A little Star Guardian world for your desktop: a sunlit TFT classroom becomes a cosmic arena after dark, while Chibi Star Guardian Lux explores the room. A matching portrait window brings warm daylight, magical starlight and a furnished sill to your second screen.
+
+**Both Wallpaper Engine and Lively Wallpaper versions are available.** Choose your app below; use one wallpaper host at a time.
+
+| App | Download | Setup |
+| --- | --- | --- |
+| Wallpaper Engine (Steam, paid app) | [Wallpaper Engine package](https://github.com/teykaijun/everything-goes-on-wallpaper/releases/download/v3.1.0/Everything-Goes-On-Wallpaper-Engine.zip) | [Installation guide](docs/WALLPAPER-ENGINE.md) |
+| Lively Wallpaper (free app) | [Lively package](https://github.com/teykaijun/everything-goes-on-wallpaper/releases/download/v3.1.0/Everything-Goes-On-TFT-Classroom-Lively.zip) | [Installation guide](docs/LIVELY.md) |
+
+[Release notes and checksums](https://github.com/teykaijun/everything-goes-on-wallpaper/releases/tag/v3.1.0)
+
+## What makes this wallpaper special
+
+- Automatic day/night themes based on your computer's local time, with adjustable schedules and a smooth crossfade. Defaults: day at 07:00, night at 19:00.
+- A landscape arena with twenty individually furnished daytime desks, personal belongings, and an open starry battlefield at night.
+- Interactive Chibi Lux with native walking and emotes, including Dance, Laugh, Taunt, Joke and Rest. She reacts to the cursor, accessible floor clicks and scenery.
+- A separate portrait window with different daytime and nighttime furnishings, floating dust, sunshafts, star glints, trails and prop lighting.
+- A 2560×1440 arena and 1440×2560 portrait loops, both at 30 fps. These are upscaled outputs; see the source-quality notes below.
+- Local playback with adjustable arena music; the portrait window stays silent. Desktop icons can optionally be arranged on the bench bands using the separate Windows helper.
+
+## Creator
+
+Created by **casunoxd**. Creator page: [Buy Me a Coffee](https://buymeacoffee.com/casunoxd).
+
+The wallpaper downloads are free and require no donation, subscription or account with the creator. Riot game imagery, character assets and music belong to their respective owners; the creator link does not confer rights to those assets. This is an unofficial fan project, not endorsed or sponsored by Riot Games. See [credits](docs/SOURCES.md).
+
+Steam Workshop listings are pending upload through the Wallpaper Engine editor; GitHub downloads are available for both apps. [Prepared listing descriptions and publishing notes](docs/PUBLISHING.md).
 
 ## Use the Wallpaper Engine version
 
@@ -41,9 +63,8 @@ controls through each project's properties. The soundtrack gain is separate
 from Wallpaper Engine's normal master volume. For the original listening level,
 use 75% engine volume and 21% soundtrack on the main monitor; the portrait is 0%.
 
-The package and game media stay local. Public releases contain code and notes.
-The existing Lively entry point and packager remain available for compatibility;
-Lively should be stopped and its startup disabled when Wallpaper Engine is active.
+Version 3.1 provides public download packages for both hosts alongside the source.
+The Lively entry point and packager are supported; stop the other wallpaper host before switching apps.
 
 ## Lux interactions
 

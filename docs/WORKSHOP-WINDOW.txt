@@ -1,0 +1,21 @@
+Everything Goes On — Star Window | Portrait Day / Night
+
+A quiet companion to the Everything Goes On arena: look through a Star Guardian-inspired classroom window as golden daylight becomes a violet, star-filled night.
+
+The sill tells a different story in each theme. Pastel books, a star planter and a wing-trimmed satchel brighten the day; a glowing plant, lantern, open spellbook and star crystal light the night. Dust and sunshafts drift through daylight, while glints, orbiting stars and cyan-pink trails shimmer after dark.
+
+Features
+• Designed for a portrait second display.
+• 1440×2560, 30 fps, 24-second animated loops, upscaled from 941×1672 illustration masters.
+• Automatic local-time day/night switching, adjustable schedule and crossfade.
+• Silent playback so the arena remains the single music source.
+• Local media; no streaming required.
+
+The furnishings are illustrated, fixed props. Lighting and particles are animated. There is no interactive Lux on this project. Apply it independently to the portrait monitor and pair it with Arena & Chibi Lux on the landscape screen.
+
+Creator: casunoxd
+Creator page: https://buymeacoffee.com/casunoxd
+Free wallpaper; no donation or subscription is required.
+Source and Lively version: https://github.com/teykaijun/everything-goes-on-wallpaper
+
+Unofficial fan artwork, not endorsed or sponsored by Riot Games. Window illustration masters were AI-generated; the lighting and particle effects are original procedural wallpaper effects. Full artwork context and credits are in the repository.
