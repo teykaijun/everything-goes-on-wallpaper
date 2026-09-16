@@ -11,7 +11,7 @@ A little Star Guardian world for your desktop: a sunlit TFT classroom becomes a 
 
 [Release notes and checksums](https://github.com/teykaijun/everything-goes-on-wallpaper/releases/tag/v3.1.0)
 
-## What makes this wallpaper special
+## Features
 
 - Automatic day/night themes based on your computer's local time, with adjustable schedules and a smooth crossfade. Defaults: day at 07:00, night at 19:00.
 - A landscape arena with twenty individually furnished daytime desks, personal belongings, and an open starry battlefield at night.
@@ -20,11 +20,15 @@ A little Star Guardian world for your desktop: a sunlit TFT classroom becomes a 
 - A 2560×1440 arena and 1440×2560 portrait loops, both at 30 fps. These are upscaled outputs; see the source-quality notes below.
 - Local playback with adjustable arena music; the portrait window stays silent. Desktop icons can optionally be arranged on the bench bands using the separate Windows helper.
 
-## Creator
+## A small thank you
 
-Created by **casunoxd**. Creator page: [Buy Me a Coffee](https://buymeacoffee.com/casunoxd).
+I made this as a fan of the Everything Goes On arena and wanted to share it with others who enjoy it too. Thanks for giving it a try — I hope it brings a little Star Guardian magic to your desktop.
 
-The wallpaper downloads are free and require no donation, subscription or account with the creator. Riot game imagery, character assets and music belong to their respective owners; the creator link does not confer rights to those assets. This is an unofficial fan project, not endorsed or sponsored by Riot Games. See [credits](docs/SOURCES.md).
+If you enjoy it and would like to leave a small tip, my [Buy Me a Coffee page](https://buymeacoffee.com/casunoxd) is here. There is no pressure; the wallpapers are free for everyone to download and use.
+
+— casunoxd
+
+This is an unofficial fan project, not endorsed or sponsored by Riot Games. Game imagery, character assets and music belong to their respective owners. See [credits](docs/SOURCES.md).
 
 Steam Workshop listings are pending upload through the Wallpaper Engine editor; GitHub downloads are available for both apps. [Prepared listing descriptions and publishing notes](docs/PUBLISHING.md).
 
