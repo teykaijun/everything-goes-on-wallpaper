@@ -1,0 +1,1 @@
+window.WALLPAPER_CONFIG = Object.assign({}, window.WALLPAPER_CONFIG, {scene:"window", host:"wallpaper-engine", volume:0, luxEnabled:false, portraitDaySources:["media/window-magic/day.webm"], portraitNightSources:["media/window-magic/night.webm"]});

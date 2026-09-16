@@ -14,6 +14,7 @@ function environment(hour = 22, overrides = {}, behavior = {}) {
   let frameId = 0;
   const frames = new Map();
   const intervals = [];
+  const timers = new Map(); let timerId=0;
   class LocalDate extends Date {
     constructor(...args) { super(...(args.length ? args : [now])); }
     static now() { return now; }
@@ -44,8 +45,13 @@ function environment(hour = 22, overrides = {}, behavior = {}) {
     addEventListener: (type, callback) => { documentEvents[type] = callback; }
   };
   const window = {
-    innerWidth: behavior.width || 2560, innerHeight: behavior.height || 1440,
-    WallpaperSchedule: schedule,
+    innerWidth: behavior.width ?? 2560, innerHeight: behavior.height ?? 1440,
+    WallpaperSchedule: schedule, WallpaperViewport: require("../viewport.js"),
+    setTimeout(callback) { timers.set(++timerId,callback); return timerId; },
+    clearTimeout(id) { timers.delete(id); },
+    CustomEvent: class { constructor(type,options) { this.type=type; this.detail=options.detail; } },
+    dispatchEvent(event) { windowEvents[event.type]?.(event); },
+    removeEventListener(type) { delete windowEvents[type]; },
     WALLPAPER_CONFIG: overrides,
     location: { search: "", reload() { this.reloaded = true; } },
     ArenaLayout: behavior.layout, ChibiLux: behavior.lux,
@@ -60,6 +66,7 @@ function environment(hour = 22, overrides = {}, behavior = {}) {
   });
   return {
     window, document, elements, documentEvents, windowEvents,
+    settle() { const current=[...timers.values()]; timers.clear(); current.forEach(callback=>callback()); },
     setHour(hour) { now = new Date(2026, 8, 12, hour).getTime(); },
     tick() { intervals.forEach(callback => callback()); },
     frame(milliseconds) {
@@ -255,12 +262,77 @@ test("desktop emote menu opens and forwards each selected native emote", async (
   assert.deepEqual(commands, ["dance", "laugh", "taunt", "joke", "stop"]);
 });
 
-test("moving the wallpaper between landscape and portrait reloads its scene", () => {
+test("automatic scene changes reload only after the new viewport settles", () => {
   const env = environment(22);
   env.windowEvents.resize();
   assert.equal(env.window.location.reloaded, undefined);
   env.window.innerWidth = 1080;
   env.window.innerHeight = 1920;
   env.windowEvents.resize();
+  assert.equal(env.window.location.reloaded, undefined);
+  env.settle();
   assert.equal(env.window.location.reloaded, true);
+});
+
+
+test('hot-plug resize bursts never reload the fixed Wallpaper Engine arena',async()=>{
+ const env=environment(12,{scene:'classroom',audioMode:'separate'});await flush();
+ for(const [w,h] of [[0,0],[1,1440],[1080,1920],[0,0],[2560,1440]]){
+  env.window.innerWidth=w;env.window.innerHeight=h;env.windowEvents.resize();
+ }
+ assert.equal(env.window.wallpaperState().viewportPending,true);
+ assert.equal(env.elements.day.paused,true);
+ env.settle();await flush();
+ assert.equal(env.window.location.reloaded,undefined);
+ assert.equal(env.window.wallpaperState().scene,'classroom');
+ assert.equal(env.window.wallpaperState().paused,false);
+ assert.equal(env.elements.day.paused,false);
+ assert.equal(env.elements['day-audio'].volume,.21);
+});
+
+test('fixed portrait project stays silent and uses WebM even with temporary landscape dimensions',async()=>{
+ const env=environment(22,{scene:'window',audioMode:'separate',portraitDaySources:['media/window-magic/day.webm'],portraitNightSources:['media/window-magic/night.webm']},{width:2560,height:1440});
+ await flush();
+ assert.equal(env.window.wallpaperState().scene,'window');
+ assert.equal(env.elements.night.children[0].src,'media/window-magic/night.webm');
+ assert.equal(env.elements['night-audio'].playCalls,0);
+ env.windowEvents.resize();env.settle();await flush();
+ assert.equal(env.window.location.reloaded,undefined);
+});
+
+test('Wallpaper Engine accepts partial settings, preserves zero volume and separates engine master volume',async()=>{
+ const env=environment(12,{scene:'classroom'});await flush();
+ env.window.wallpaperPropertyListener.applyUserProperties({soundtrackVolume:{value:0},mode:{value:'night'}});await flush();env.frame(8000);
+ assert.equal(env.window.wallpaperState().settings.volume,0);
+ assert.equal(env.window.wallpaperState().active,'night');
+ env.window.wallpaperPropertyListener.applyUserProperties({dayStartHour:{value:8},volume:{value:75}});
+ assert.equal(env.window.wallpaperState().settings.volume,0);
+ assert.equal(env.window.wallpaperState().settings.dayStartHour,8);
+});
+
+test('Wallpaper Engine pause and resume recheck the wall clock',async()=>{
+ const env=environment(12,{scene:'classroom'});await flush();
+ env.window.wallpaperPropertyListener.setPaused(true);env.setHour(22);env.tick();
+ assert.equal(env.elements.night.playCalls,0);
+ env.window.wallpaperPropertyListener.setPaused(false);await flush();
+ assert.equal(env.window.wallpaperState().active,'night');
+ assert.equal(env.elements.day.paused,true);
+});
+
+test('Wallpaper Engine FPS updates limit Lux without overriding other properties',()=>{
+ const updates=[];
+ const env=environment(12,{scene:'classroom'},{layout:{create:()=>({setPaused(){},setMix(){}})},lux:{create:()=>({setPaused(){},configure(v){updates.push(v);}})}});
+ env.window.wallpaperPropertyListener.applyGeneralProperties({fps:15});
+ assert.equal(updates.at(-1).fps,15);
+ env.window.wallpaperPropertyListener.applyGeneralProperties({fps:120});
+ assert.equal(updates.at(-1).fps,30);
+ env.window.wallpaperPropertyListener.applyGeneralProperties({fps:0});
+ assert.equal(updates.length,2);
+});
+
+test('empty startup viewport waits before loading video or creating renderers',async()=>{
+ const env=environment(12,{scene:'classroom'},{width:0,height:0});
+ assert.equal(env.window.wallpaperState,undefined);
+ env.window.innerWidth=2560;env.window.innerHeight=1440;env.settle();await flush();
+ assert.equal(env.window.wallpaperState().active,'day');
 });

@@ -1,57 +1,49 @@
-# Everything Goes On — TFT Classroom
+# Everything Goes On - Wallpaper Engine
 
-Version **2.4.0** is a Lively Wallpaper setup for a horizontal main monitor and a
-vertical secondary monitor. It combines TFT's **Everything Goes On** arena and
-instrumental soundtrack with a daytime classroom, desktop icons on the arena's
-bench bands, an interactive native 3D **Chibi Star Guardian Lux**, and a separate
-furnished, animated Star Guardian window view for the portrait display.
+Version **3.0.0** runs the existing Everything Goes On arena and interactive
+Chibi Star Guardian Lux in **Wallpaper Engine**, with a separate furnished
+Star Guardian window for the portrait display. Day/night themes follow local
+time, and the main soundtrack remains at 21%; the portrait display is silent.
+The 20-seat classroom, bench icons and individual belongings are retained.
 
-## Use the wallpaper
+## Use the Wallpaper Engine version
 
-The current code is version **2.4.0**. The finished Lively package is saved
-locally as `dist/Everything-Goes-On-TFT-Classroom-Lively.zip`. It is not
-attached to a public release because it bundles extracted game media. Use the
-build instructions below to assemble the package from your local assets.
-Separate day and night portrait MP4s remain available in the
-[v2.2.0 release](https://github.com/teykaijun/everything-goes-on-wallpaper/releases/tag/v2.2.0).
+The two complete local projects are bundled in
+`dist/Everything-Goes-On-Wallpaper-Engine.zip`. Extract them into Wallpaper
+Engine's `projects/myprojects/` directory, then select **Everything Goes On -
+Arena & Lux** for the landscape monitor and **Everything Goes On - Star Window**
+for the portrait monitor. Use separate wallpapers per display.
 
-1. Install [Lively Wallpaper](https://www.rocksdanister.com/lively/) and import the ZIP.
-2. Choose independent wallpapers per display, then apply this project to both monitors.
-3. In **Customize**, use soundtrack volume **21% on the main monitor** and **0% on the secondary monitor**.
-4. Keep Lively's wallpaper input set to **Mouse**. Keyboard input is not required.
+Use the installed Steam launcher for first startup after installation so its
+program files are deployed correctly. Wallpaper Engine's display configuration
+remembers the project's monitor assignment; keep monitor identification stable
+when connecting/disconnecting displays. [Migration and verification notes](docs/WALLPAPER-ENGINE.md).
 
-The **2560x1440 landscape view** shows the arena with **20 desks in four rows
-of five**, matching the latest TFT gameplay screenshot. The screenshot was
-aligned to shared arena landmarks before measuring tabletop centers, desk
-widths, row spacing and perspective. Smaller golden-orange desks have low orange
-chairs on the viewer side. Twenty distinct illustrated sprites retain individual
-books, bags, pencil cases, bottles and small Star Guardian accessories.
-Window-side shading and floor shadows integrate the furniture with the arena.
-The artwork is a generated adaptation of the native appearance.
+Each project fixes its scene role. A briefly changed aspect ratio during a
+monitor connection cannot turn the arena into the portrait window or cause a
+page reload. Resizes wait 500 ms for valid settled dimensions, and Lux handles
+WebGL context loss/restoration. The portrait project uses supported VP9 WebM
+video and omits Lux's model and renderer. Both retain local-clock day/night
+switching (07:00/19:00), an 8-second crossfade, and native mouse interactions.
 
-The added desks and chairs fade out at night; their collision obstacles and
-desk-visit targets are removed too. The arena's original side chairs remain in
-the source footage. Lux walks through the open night arena and navigates around
-the daytime furniture.
+Build both projects from retained local media:
 
-The **1080×1920 portrait display** receives its own furnished window composition,
-with the same rectangular frame, cream curtains, and room geometry across themes.
-By day, a pink star planter, mint pencil cup, pastel books, and a wing-trimmed pink
-satchel sit on the sill; white-and-pink trainers rest on the floor. Visible dust
-and warm sunshafts move through the golden light.
+```powershell
+npm ci
+npm run build:lux
+npm test
+python scripts/build_engine_media.py
+python scripts/package_wallpaper_engine.py
+```
 
-At night, a cyan-purple plant, star lantern, open spellbook, and pink star crystal
-light the sill. The bag moves to the left floor and violet light reflects from
-the shoes. Four-point glints, orbiting gold stars, cyan-pink trails, and local prop
-glows animate the scene. These effects are encoded into the MP4; the illustrated
-props and window structure remain still within each theme. This portrait scene
-is unchanged from v2.2; the bench icon positions and native Lux are also retained.
+Wallpaper Engine exposes theme, schedule, crossfade, soundtrack volume and Lux
+controls through each project's properties. The soundtrack gain is separate
+from Wallpaper Engine's normal master volume. For the original listening level,
+use 75% engine volume and 21% soundtrack on the main monitor; the portrait is 0%.
 
-Defaults are **day 07:00–19:00**, night outside those hours, an **8-second
-crossfade**, and **21% main-display soundtrack volume**, a 40% relative reduction
-from the previous 35%. Both displays use the Windows local clock. Keep their schedules matched; Lively saves customization
-per display. The live Lux companion and classroom furniture belong to the
-landscape view.
+The package and game media stay local. Public releases contain code and notes.
+The existing Lively entry point and packager remain available for compatibility;
+Lively should be stopped and its startup disabled when Wallpaper Engine is active.
 
 ## Lux interactions
 
@@ -220,7 +212,7 @@ dotnet build scripts/desktop-layout/DesktopLayout.csproj --configuration Release
 .\scripts\desktop-layout\Test-ReadOnly.ps1
 ```
 
-The Lively output is `dist/Everything-Goes-On-TFT-Classroom-Lively.zip`.
+The legacy Lively output is `dist/Everything-Goes-On-TFT-Classroom-Lively.zip`.
 Desktop helper checks perform inventory and dry-runs and verify that icon
 positions remain unchanged. Game files are read without modifying the
 installation. Game media, generated masters, local backups, and build packages

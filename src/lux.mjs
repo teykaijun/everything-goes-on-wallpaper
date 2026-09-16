@@ -27,7 +27,8 @@ export function planNavigationChange(motion,position,options){
 
 window.ChibiLux={create({element,layout,getState,enabled=true,size=100,speed=100,interactions=true}){
   const motion=window.LuxMotion;
-  let destroyed=false,paused=false,loaded=false,failed=false,frame=0,last=0,elapsed=0;
+  let destroyed=false,paused=false,loaded=false,failed=false,contextLost=false,frame=0,last=0,elapsed=0;
+  let targetFps=30;
   const settings={enabled:enabled!==false,size:clamp(size,45,160),speed:clamp(speed,50,150),interactions:interactions!==false};
   let mixer,actor,currentAction=null,currentClip='',sequencer,navigator,environment;
   let currentRunRate=1;
@@ -49,6 +50,15 @@ window.ChibiLux={create({element,layout,getState,enabled=true,size=100,speed=100
   renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.25));
   renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.NoToneMapping;
   renderer.domElement.className='lux-canvas';sprite.appendChild(renderer.domElement);
+  function onContextLost(event){
+    event.preventDefault();contextLost=true;cancelAnimationFrame(frame);frame=0;last=0;sprite.hidden=true;
+  }
+  function onContextRestored(){
+    contextLost=false;renderWidth=0;renderHeight=0;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.25));restart();
+  }
+  renderer.domElement.addEventListener('webglcontextlost',onContextLost);
+  renderer.domElement.addEventListener('webglcontextrestored',onContextRestored);
   const scene=new THREE.Scene();
   // Match the arena's elevated camera and allow room for the native staff/Pet emotes.
   const camera=new THREE.OrthographicCamera(-2.3,2.3,2.4,-2.4,.1,100);
@@ -78,6 +88,8 @@ window.ChibiLux={create({element,layout,getState,enabled=true,size=100,speed=100
     return {polygon,bounds,obstacles:classroom.getObstacles?.()||[],waypoints:classroom.getWaypoints?.()||[],padding:Math.max(6,rect.height*.08*1.06*settings.size/100*.1)};
   }
   function resize(event){
+    if(innerWidth<64||innerHeight<64)return;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.25));
     if(event?.type==='classroom-layout'&&event.detail?.navigationChanged===false)return;
     const oldViewport=viewport,nextViewport={width:innerWidth,height:innerHeight},options=readEnvironment();
     const key=navigationFingerprint(options,nextViewport);
@@ -181,11 +193,11 @@ window.ChibiLux={create({element,layout,getState,enabled=true,size=100,speed=100
   }
   function tick(now){
     frame=0;
-    if(destroyed||paused||!settings.enabled||!loaded)return;
+    if(destroyed||paused||contextLost||!settings.enabled||!loaded)return;
     const state=getState()||{};
     if(state.paused){last=0;frame=requestAnimationFrame(tick);return;}
     // The source game animation and arena are 30fps; avoid unnecessary 60fps WebGL work.
-    if(last&&now-last<1000/30-.5){frame=requestAnimationFrame(tick);return;}
+    if(last&&now-last<1000/targetFps-.5){frame=requestAnimationFrame(tick);return;}
     const dt=last?Math.min(.1,(now-last)/1000):0;last=now;elapsed+=dt;
     const before=navigator.snapshot(),heightOnFloor=bodyHeight(before.y);
     navigator.setSpeed(heightOnFloor*NATIVE_BODY_HEIGHTS_PER_SECOND*settings.speed/100);
@@ -223,8 +235,8 @@ window.ChibiLux={create({element,layout,getState,enabled=true,size=100,speed=100
     frame=requestAnimationFrame(tick);
   }
   function restart(){
-    sprite.hidden=!settings.enabled||failed;
-    if(!frame&&!paused&&settings.enabled&&loaded){last=0;frame=requestAnimationFrame(tick);}
+    sprite.hidden=!settings.enabled||failed||contextLost;
+    if(!frame&&!paused&&!contextLost&&!destroyed&&settings.enabled&&loaded){last=0;frame=requestAnimationFrame(tick);}
   }
   function ignoredPointer(event){
     return !settings.interactions||paused||!loaded||!settings.enabled||(getState()||{}).paused||event.target?.closest?.('[data-lux-ui],#preview-panel,button,input,select,textarea,a');
@@ -260,7 +272,7 @@ window.ChibiLux={create({element,layout,getState,enabled=true,size=100,speed=100
       });
     });
   }
-  window.addEventListener('resize',resize);
+  window.addEventListener(window.WallpaperViewport?'wallpaper-resize':'resize',resize);
   window.addEventListener('classroom-layout',resize);
   window.addEventListener('lux-command',commandEvent);
   document.addEventListener('mousemove',pointerMove,{passive:true});
@@ -301,6 +313,7 @@ window.ChibiLux={create({element,layout,getState,enabled=true,size=100,speed=100
   return {
     setPaused(value){paused=Boolean(value);if(paused){cancelAnimationFrame(frame);frame=0;last=0;}else restart();},
     configure(options={}){
+      if('fps'in options)targetFps=clamp(options.fps,1,30);
       if('enabled'in options)settings.enabled=Boolean(options.enabled);
       if('size'in options)settings.size=clamp(options.size,45,160);
       if('speed'in options)settings.speed=clamp(options.speed,50,150);
@@ -310,11 +323,12 @@ window.ChibiLux={create({element,layout,getState,enabled=true,size=100,speed=100
       restart();
     },
     command(name){commandEvent({detail:{name}});},
-    status(){return {loaded,failed,paused,enabled:settings.enabled,interactions:settings.interactions,elapsed,animation:currentClip,runTimeScale:currentRunRate,evacuating:Boolean(pendingEnvironment),deskObstacles:environment?.obstacles.length||0,navigation:navigator?.snapshot(),clips:{walk:[...clips.keys()].find(name=>/^run$/i.test(name)),idle:[...clips.keys()].find(name=>/^idle$/i.test(name))}};},
+    status(){return {loaded,failed,paused,contextLost,fps:targetFps,enabled:settings.enabled,interactions:settings.interactions,elapsed,animation:currentClip,runTimeScale:currentRunRate,evacuating:Boolean(pendingEnvironment),deskObstacles:environment?.obstacles.length||0,navigation:navigator?.snapshot(),clips:{walk:[...clips.keys()].find(name=>/^run$/i.test(name)),idle:[...clips.keys()].find(name=>/^idle$/i.test(name))}};},
     destroy(){
       destroyed=true;cancelAnimationFrame(frame);
-      window.removeEventListener('resize',resize);window.removeEventListener('classroom-layout',resize);window.removeEventListener('lux-command',commandEvent);
+      window.removeEventListener(window.WallpaperViewport?'wallpaper-resize':'resize',resize);window.removeEventListener('classroom-layout',resize);window.removeEventListener('lux-command',commandEvent);
       document.removeEventListener('mousemove',pointerMove);document.removeEventListener('click',pointerClick);
+      renderer.domElement.removeEventListener('webglcontextlost',onContextLost);renderer.domElement.removeEventListener('webglcontextrestored',onContextRestored);
       mixer?.stopAllAction();disposeModel();renderer.dispose();sprite.remove();
     }
   };

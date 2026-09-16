@@ -2,7 +2,7 @@
 
 This personal fan wallpaper combines the **Everything Goes On** arena and
 **Chibi Star Guardian Lux** from Teamfight Tactics with original furniture and
-generated portrait artwork. The current release is **v2.4.0 - TFT Classroom**.
+generated portrait artwork. The current release is **v3.0.0 - Wallpaper Engine**.
 It is not an official Riot Games product.
 
 ## Arena footage and design references
@@ -137,6 +137,14 @@ Extraction references:
 
 - [CommunityDragon WAD reader](https://github.com/CommunityDragon/CDTB/blob/master/cdtb/wad.py).
 - [vgmstream decoder](https://github.com/vgmstream/vgmstream).
+
+## Wallpaper Engine migration
+
+Version 3.0 retains the existing artwork and game media. Portrait MP4s are
+converted to VP9 WebM for the Wallpaper Engine web host, with the same duration,
+resolution and effects. The two projects fix their display roles and add settled
+resize handling, native property/playback events and Lux graphics recovery.
+[Migration details and official references](WALLPAPER-ENGINE.md).
 
 ## Runtime and desktop integration
 

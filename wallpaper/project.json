@@ -1,0 +1,103 @@
+{
+  "description": "Everything Goes On arena, individually furnished classroom and interactive native Star Guardian Lux. Automatic local-clock day/night themes. Local personal project.",
+  "file": "index.html",
+  "preview": "thumbnail.jpg",
+  "title": "Everything Goes On - Arena & Lux",
+  "type": "web",
+  "general": {
+    "properties": {
+      "mode": {
+        "type": "combo",
+        "value": "automatic",
+        "text": "Theme",
+        "options": [
+          {
+            "value": "automatic",
+            "label": "Follow local time"
+          },
+          {
+            "value": "day",
+            "label": "Day"
+          },
+          {
+            "value": "night",
+            "label": "Night"
+          }
+        ],
+        "order": 0
+      },
+      "dayStartHour": {
+        "type": "slider",
+        "text": "Day begins (24-hour time)",
+        "value": 7,
+        "min": 0,
+        "max": 23.75,
+        "step": 0.25,
+        "editable": true,
+        "order": 1
+      },
+      "nightStartHour": {
+        "type": "slider",
+        "text": "Night begins (24-hour time)",
+        "value": 19,
+        "min": 0,
+        "max": 23.75,
+        "step": 0.25,
+        "editable": true,
+        "order": 2
+      },
+      "transitionSeconds": {
+        "type": "slider",
+        "text": "Day/night crossfade (seconds)",
+        "value": 8,
+        "min": 0,
+        "max": 60,
+        "step": 1,
+        "editable": true,
+        "order": 3
+      },
+      "soundtrackVolume": {
+        "type": "slider",
+        "text": "Soundtrack volume (%)",
+        "value": 21,
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "editable": true,
+        "order": 4
+      },
+      "luxSize": {
+        "type": "slider",
+        "text": "Lux size (%)",
+        "value": 100,
+        "min": 65,
+        "max": 160,
+        "step": 5,
+        "editable": true,
+        "order": 5
+      },
+      "luxSpeed": {
+        "type": "slider",
+        "text": "Lux walking speed (%)",
+        "value": 100,
+        "min": 50,
+        "max": 150,
+        "step": 5,
+        "editable": true,
+        "order": 6
+      },
+      "luxEnabled": {
+        "type": "bool",
+        "text": "Chibi Star Guardian Lux",
+        "value": true,
+        "order": 7
+      },
+      "luxInteractions": {
+        "type": "bool",
+        "text": "Lux reacts to cursor, clicks and scenery",
+        "value": true,
+        "order": 8
+      }
+    }
+  }
+}

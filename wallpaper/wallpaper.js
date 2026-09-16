@@ -1,9 +1,12 @@
-(function () {
+(function initialize() {
   "use strict";
+  // Windows can briefly report an empty surface while a display is reconnecting.
+  if (window.WallpaperViewport && !window.WallpaperViewport.valid(window.innerWidth, window.innerHeight)) { window.setTimeout(initialize, 250); return; }
   var schedule = window.WallpaperSchedule;
   var config = window.WALLPAPER_CONFIG || {};
-  var isPortraitWindow = window.innerHeight > window.innerWidth;
-  if (isPortraitWindow) config = Object.assign({}, config, {daySources:["media/window-magic/day.mp4"], nightSources:["media/window-magic/night.mp4"], volume:0, luxEnabled:false});
+  var fixedScene = config.scene === "window" || config.scene === "classroom";
+  var isPortraitWindow = fixedScene ? config.scene === "window" : window.innerHeight > window.innerWidth;
+  if (isPortraitWindow) config = Object.assign({}, config, {daySources:config.portraitDaySources || ["media/window-magic/day.mp4"], nightSources:config.portraitNightSources || ["media/window-magic/night.mp4"], volume:0, luxEnabled:false});
   document.documentElement.dataset.scene = isPortraitWindow ? "window" : "classroom";
   var settings = schedule.normalize(config);
   var phases = ["day", "night"];
@@ -17,6 +20,8 @@
   var generation = 0;
   var frame = 0;
   var livelyPaused = false;
+  var viewportPending = false;
+  var targetFps = 30;
   var hidden = document.hidden;
   var browserMuted = false;
   var pageHidden = false;
@@ -57,7 +62,7 @@
     if (message) console.warn("[Everything Goes On] " + message);
   }
 
-  function paused() { return livelyPaused || hidden || pageHidden; }
+  function paused() { return livelyPaused || hidden || pageHidden || viewportPending; }
 
   function render() {
     // An opaque day layer under a fading night layer avoids a dip to black at midfade.
@@ -120,7 +125,7 @@
   }
 
   function startAudio(phase) {
-    if (!separateAudio) return;
+    if (!separateAudio || isPortraitWindow) return;
     // Audio has its own full-length loop. A missing or slow soundtrack must not
     // keep an otherwise playable arena video hidden indefinitely.
     playElement(audio[phase]).then(function () {
@@ -206,7 +211,7 @@
     var now = new Date();
     var phase = schedule.phaseAt(now, settings);
     document.getElementById("clock").textContent = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-    document.getElementById("phase-label").textContent = (phase === "day" ? "Daylight" : "Nightfall") + (settings.mode === "automatic" ? " · automatic" : " · fixed");
+    document.getElementById("phase-label").textContent = (phase === "day" ? "Daylight" : "Nightfall") + (settings.mode === "automatic" ? " Ã‚Â· automatic" : " Ã‚Â· fixed");
     document.getElementById("phase-dot").style.background = phase === "day" ? "#f0d1a1" : "#b4b7ef";
     document.getElementById("mode").value = settings.mode;
     document.getElementById("day-start").value = asTime(settings.dayStartHour);
@@ -323,13 +328,35 @@
     var button = event.target.closest("button[data-emote]");
     if (button && lux) lux.command(button.dataset.emote);
   });
-  window.addEventListener("resize", function () {
-    if ((window.innerHeight > window.innerWidth) !== isPortraitWindow) window.location.reload();
+  function settleViewport() {
+    if (!fixedScene && (window.innerHeight > window.innerWidth) !== isPortraitWindow) { window.location.reload(); return; }
+    viewportPending = false; syncEffects(); reconcile(true);
+  }
+  var viewportWatcher = window.WallpaperViewport && window.WallpaperViewport.create(window, {
+    onPending: function () { viewportPending = true; syncEffects(); cancelFade(); phases.forEach(pausePhase); },
+    onSettled: settleViewport
   });
+
+  // Wallpaper Engine sends partial property updates and owns process suspension.
+  window.wallpaperPropertyListener = {
+    applyUserProperties: function (properties) {
+      Object.keys(properties || {}).forEach(function (name) {
+        if (name === "volume") return; // Engine master volume is separate from soundtrack gain.
+        if (properties[name] && Object.prototype.hasOwnProperty.call(properties[name], "value")) setProperty(name === "soundtrackVolume" ? "volume" : name, properties[name].value);
+      });
+    },
+    applyGeneralProperties: function (properties) {
+      if (properties && Number.isFinite(Number(properties.fps)) && Number(properties.fps) > 0) {
+        targetFps = Math.max(1, Math.min(30, Number(properties.fps)));
+        if (lux) lux.configure({fps:targetFps});
+      }
+    },
+    setPaused: function (value) { window.livelyWallpaperPlaybackChanged({IsPaused:Boolean(value)}); }
+  };
 
   // Read-only diagnostics for local smoke tests and the preview console.
   window.wallpaperState = function () {
-    return { active: active, pending: pending, nightMix: mix, paused: paused(), browserMuted: browserMuted, settings: Object.assign({}, settings) };
+    return { active: active, pending: pending, nightMix: mix, paused: paused(), browserMuted: browserMuted, scene:isPortraitWindow ? "window" : "classroom", viewportPending:viewportPending, fps:targetFps, settings: Object.assign({}, settings) };
   };
   if (window.ArenaLayout) sceneLayout = window.ArenaLayout.create({day: videos.day, night: videos.night, canvas: document.getElementById("ambient"), sceneMode: isPortraitWindow ? "window" : "classroom", getState: function () { return {nightMix: mix, paused: paused()}; }});
   if (window.ClassroomScene && !isPortraitWindow) classroom = window.ClassroomScene.create({element:document.getElementById("classroom-desks"), enabled:config.classroomDesks !== false, getState:function(){return {nightMix:mix,paused:paused()};}});

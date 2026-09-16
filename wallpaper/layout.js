@@ -77,6 +77,7 @@
     }
 
     function resize() {
+      if (host.innerWidth < 64 || host.innerHeight < 64) return;
       viewportWidth = finiteSize(host.innerWidth);
       viewportHeight = finiteSize(host.innerHeight);
       rect = options.sceneMode === "window" ? { x:0, y:0, width:viewportWidth, height:viewportHeight, orientation:"portrait" } : getArenaRect(viewportWidth, viewportHeight);
@@ -87,7 +88,7 @@
       root.style.setProperty("--arena-height", rect.height + "px");
       if (canvas) {
         // At most 320 pixels on the short axis; a blurred light wash needs no 2K redraw.
-        var ratio = Math.min(1, 320 / Math.min(viewportWidth, viewportHeight));
+        var ratio = Math.min(1, 640 / Math.max(viewportWidth, viewportHeight), 320 / Math.min(viewportWidth, viewportHeight));
         canvas.width = Math.round(viewportWidth * ratio);
         canvas.height = Math.round(viewportHeight * ratio);
       }
@@ -145,11 +146,11 @@
     function destroy() {
       disposed = true;
       host.cancelAnimationFrame(frame);
-      host.removeEventListener("resize", resize);
+      host.removeEventListener(host.WallpaperViewport ? "wallpaper-resize" : "resize", resize);
       if (createdAtmosphere) atmosphere.remove();
     }
 
-    host.addEventListener("resize", resize);
+    host.addEventListener(host.WallpaperViewport ? "wallpaper-resize" : "resize", resize);
     resize();
     setPaused(Boolean((getState() || {}).paused));
     return { resize: resize, setPaused: setPaused, setMix: setMix, draw: draw, destroy: destroy, getRect: function () { return Object.assign({}, rect); } };

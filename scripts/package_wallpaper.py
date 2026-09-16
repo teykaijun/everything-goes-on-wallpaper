@@ -7,7 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 WALLPAPER = ROOT / "wallpaper"
 FILES = [
     "index.html", "style.css", "config.js", "schedule.js", "wallpaper.js",
-    "layout.js", "bench-layout.js", "classroom-geometry.js", "classroom.js", "classroom.css", "lux.js", "lux-motion.js", "media/lux/animation-data.js", "media/lux/model.js", "vendor/THREE-LICENSE.txt",
+    "layout.js", "viewport.js", "bench-layout.js", "classroom-geometry.js", "classroom.js", "classroom.css", "lux.js", "lux-motion.js", "media/lux/animation-data.js", "media/lux/model.js", "vendor/THREE-LICENSE.txt",
     "LivelyInfo.json", "LivelyProperties.json", "thumbnail.jpg",
     "media/classroom-v4/desks.png", "media/day-clean.webm", "media/night-clean.webm", "media/window-magic/day.mp4", "media/window-magic/night.mp4", "media/day.ogg", "media/night.ogg"
 ]
